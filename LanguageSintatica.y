@@ -6,7 +6,7 @@
 #define YYSTYPE atributos
 
 using namespace std;
-char registrador='`';
+int registrador=0;
 struct atributos
 {
 	string label;
@@ -21,6 +21,8 @@ typedef struct {
 vector<TIPO_SIMBOLO> tabelaSimbolos;
 int yylex(void);
 string GerarRegistrador();
+TIPO_SIMBOLO verificaDeclaracao(string nome);
+TIPO_SIMBOLO verificaExistencia(string nome);
 void yyerror(string);
 %}
 
@@ -30,7 +32,8 @@ void yyerror(string);
 
 %start S
 
-%left '+'
+%left '+' '-'
+%left '*' '/'
 
 %%
 
@@ -54,14 +57,27 @@ COMANDOS	: COMANDO COMANDOS{
 			}
 			;
 
-COMANDO 	: E ';'
-			| TK_TIPO_INT TK_ID ';'{
-				TIPO_SIMBOLO valor;
+COMANDO 	:
+			 /* E ';' */
+			/* | */
+			 TK_TIPO_INT TK_ID ';'{
+				TIPO_SIMBOLO valor=verificaExistencia($2.label);
 				valor.nomeVariavel=$2.label;
 				valor.tipoVariavel="int";
 				tabelaSimbolos.push_back(valor);
 				$$.traducao="";
 				$$.label="";
+			}
+			|TK_TIPO_INT TK_ID TK_IGUAL E ';'{
+				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
+				$$.tipo=variavel.tipoVariavel;
+				$$.label=GerarRegistrador();
+				$$.traducao = "\t"+ $$.label+" = " + $2.label + ";\n";
+				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+			}
+			|TK_ID TK_IGUAL E ';'{
+				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
+				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
 
@@ -71,34 +87,23 @@ E 			: E '+' E
 				$$.traducao = $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
-			|TK_ID TK_IGUAL E{
-				bool encontrei=false;
-				TIPO_SIMBOLO variavel;
-				for(int i=0;i<tabelaSimbolos.size();i++){
-					if(tabelaSimbolos[i].nomeVariavel.compare($1.label)==0){
-						variavel=tabelaSimbolos[i];
-						encontrei=true;
-					}
-				}if(!encontrei){
-					yyerror("Você não declarou a varivel");
-				}
-				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
-			}
-			|TK_TIPO_INT TK_ID TK_IGUAL E{
-				bool encontrei=false;
-				TIPO_SIMBOLO variavel;
-				for(int i=0;i<tabelaSimbolos.size();i++){
-					if(tabelaSimbolos[i].nomeVariavel.compare($2.label)==0){
-						variavel=tabelaSimbolos[i];
-						encontrei=true;
-					}
-				}if(encontrei){
-					yyerror("Já existe uma varivel com esse nome ");
-				}
-				$$.tipo=variavel.tipoVariavel;
+			|E '*' E
+			{
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+ $$.label+" = " + $2.label + ";\n";
-				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				$$.traducao = $1.traducao + $3.traducao +
+				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
+			}
+			|E '-' E
+			{
+				$$.label=GerarRegistrador();
+				$$.traducao = $1.traducao + $3.traducao +
+				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
+			}
+			|E '/' E
+			{
+				$$.label=GerarRegistrador();
+				$$.traducao = $1.traducao + $3.traducao +
+				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
 			| TK_NUM
 			{
@@ -107,17 +112,7 @@ E 			: E '+' E
 				$$.traducao = "\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
-				bool encontrei=false;
-				TIPO_SIMBOLO variavel;
-				for(int i=0;i<tabelaSimbolos.size();i++){
-					if(tabelaSimbolos[i].nomeVariavel.compare($1.label)==0){
-						variavel=tabelaSimbolos[i];
-						encontrei=true;
-					}
-				}
-				if(!encontrei){
-					yyerror("Você não declarou a varivel");
-				}
+				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
 				$$.traducao = "\t"+ $$.label+" = " + $1.label + ";\n";
@@ -136,10 +131,39 @@ int main( int argc, char* argv[] )
 
 	return 0;
 }
-
+TIPO_SIMBOLO verificaExistencia(string nome){
+		bool encontrei=false;
+		TIPO_SIMBOLO valor;
+		for(int i=0;i<tabelaSimbolos.size();i++){
+			if(tabelaSimbolos[i].nomeVariavel.compare(nome)==0){
+				valor=tabelaSimbolos[i];
+				encontrei=true;
+			}
+			}
+		if(encontrei){
+			yyerror("Já existe uma varivel com esse nome ");
+		}
+		return valor;
+}	
+TIPO_SIMBOLO verificaDeclaracao(string nome){
+		bool encontrei=false;
+		TIPO_SIMBOLO variavel;
+		for(int i=0;i<tabelaSimbolos.size();i++){
+			if(tabelaSimbolos[i].nomeVariavel.compare(nome)==0){
+				variavel=tabelaSimbolos[i];
+				encontrei=true;
+						
+			}
+		}
+		if(!encontrei){
+			yyerror("Você não declarou a varivel 1");
+		}
+		return variavel;
+}
 string GerarRegistrador(){
 	registrador=registrador+1;
-	string s(1,registrador);
+	/* string s(1,registrador); */
+	string s="temp"+std::to_string(registrador);
 	return s;
 }
 
