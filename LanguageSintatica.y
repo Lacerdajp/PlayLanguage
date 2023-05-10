@@ -65,15 +65,13 @@ COMANDO 	:
 				valor.nomeVariavel=$2.label;
 				valor.tipoVariavel="int";
 				tabelaSimbolos.push_back(valor);
-				$$.traducao="";
+				$$.traducao="\t"+valor.tipoVariavel+" "+$2.label+";\n";
 				$$.label="";
 			}
 			|TK_TIPO_INT TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
 				$$.tipo=variavel.tipoVariavel;
-				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+ $$.label+" = " + $2.label + ";\n";
-				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				$$.traducao="\tint "+$2.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
 			|TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
@@ -84,38 +82,39 @@ COMANDO 	:
 E 			: E '+' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = $1.traducao + $3.traducao +
+				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+
+				$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
 			|E '*' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = $1.traducao + $3.traducao +
+				$$.traducao ="\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+ $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
 			|E '-' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = $1.traducao + $3.traducao +
+				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
 			|E '/' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = $1.traducao + $3.traducao +
+				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
 			| TK_NUM
 			{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+ $$.label+" = " + $1.label + ";\n";
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+ $$.label+" = " + $1.label + ";\n";
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			;
 
