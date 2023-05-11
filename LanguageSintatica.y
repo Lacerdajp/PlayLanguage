@@ -39,7 +39,7 @@ void yyerror(string);
 
 S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
-				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
 
@@ -70,12 +70,14 @@ COMANDO 	:
 			}
 			|TK_TIPO_INT TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
-				$$.tipo=variavel.tipoVariavel;
-				$$.traducao="\tint "+$2.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				variavel.nomeVariavel=$2.label;
+				variavel.tipoVariavel="int";
+				tabelaSimbolos.push_back(variavel);
+				$$.traducao="\tint "+$2.label+";\n"+"\tint "+$4.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
 			|TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
-				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
+				$$.traducao="\tint "+$3.label+";\n"+$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
 
@@ -111,6 +113,7 @@ E 			: E '+' E
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
+				cout<<$1.label<<endl;
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
