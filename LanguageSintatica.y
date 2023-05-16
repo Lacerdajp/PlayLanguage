@@ -26,8 +26,8 @@ TIPO_SIMBOLO verificaExistencia(string nome);
 void yyerror(string);
 %}
 
-%token TK_NUM
-%token TK_MAIN TK_ID TK_TIPO_INT
+%token TK_NUM TK_REAL
+%token TK_MAIN TK_ID TK_INT TK_FLOAT
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -37,7 +37,7 @@ void yyerror(string);
 
 %%
 
-S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
+S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
 			{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}
@@ -56,68 +56,79 @@ COMANDOS	: COMANDO COMANDOS{
 				$$.traducao="";
 			}
 			;
-
+TK_TIPO:    TK_INT{
+				$$.tipo="int";
+			}
+			| TK_FLOAT{
+				$$.tipo="float";
+			}
 COMANDO 	:
 			 /* E ';' */
 			/* | */
-			 TK_TIPO_INT TK_ID ';'{
+			 TK_TIPO TK_ID ';'{
 				TIPO_SIMBOLO valor=verificaExistencia($2.label);
 				valor.nomeVariavel=$2.label;
-				valor.tipoVariavel="int";
+				valor.tipoVariavel=$1.tipo;
 				tabelaSimbolos.push_back(valor);
 				$$.traducao="\t"+valor.tipoVariavel+" "+$2.label+";\n";
 				$$.label="";
 			}
-			|TK_TIPO_INT TK_ID TK_IGUAL E ';'{
+			|TK_TIPO TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
 				variavel.nomeVariavel=$2.label;
-				variavel.tipoVariavel="int";
+				variavel.tipoVariavel=$1.tipo;
 				tabelaSimbolos.push_back(variavel);
-				$$.traducao="\tint "+$2.label+";\n"+"\tint "+$4.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				$$.traducao="\t"+variavel.tipoVariavel+" "+$2.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
 			|TK_ID TK_IGUAL E ';'{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
-				$$.traducao="\tint "+$3.label+";\n"+$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
+				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
 
 E 			: E '+' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+
+				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+
 				$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
 			|E '*' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao ="\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+ $1.traducao + $3.traducao +
+				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+ $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
 			|E '-' E
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+$1.traducao + $3.traducao +
+				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
 			|E '/' E
 			{
+
 				$$.label=GerarRegistrador();
-				$$.traducao = "\tint "+$1.label+";\n"+ "\tint "+$3.label+";\n"+"\tint "+$$.label+";\n"+$1.traducao + $3.traducao +
+				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
 			| TK_NUM
 			{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
+			}
+			|TK_REAL{
+				$$.tipo="float";
+				$$.label=GerarRegistrador();
+				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
 				cout<<$1.label<<endl;
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			;
 
