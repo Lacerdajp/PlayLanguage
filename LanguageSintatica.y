@@ -16,6 +16,7 @@ struct atributos
 typedef struct {
 	string nomeVariavel;
 	string tipoVariavel;
+	bool temp;
 }TIPO_SIMBOLO;
 
 vector<TIPO_SIMBOLO> tabelaSimbolos;
@@ -34,7 +35,6 @@ void yyerror(string);
 
 %left '+' '-'
 %left '*' '/'
-
 %%
 
 S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
@@ -45,7 +45,11 @@ S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
 
 BLOCO		: '{' COMANDOS '}'
 			{
-				$$.traducao = $2.traducao;
+				string declaracoes="";
+				for(TIPO_SIMBOLO atual: tabelaSimbolos){
+					declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
+				}
+				$$.traducao = declaracoes+$2.traducao;
 			}
 			;
 
@@ -69,66 +73,101 @@ COMANDO 	:
 				TIPO_SIMBOLO valor=verificaExistencia($2.label);
 				valor.nomeVariavel=$2.label;
 				valor.tipoVariavel=$1.tipo;
+				valor.temp=false;
 				tabelaSimbolos.push_back(valor);
-				$$.traducao="\t"+valor.tipoVariavel+" "+$2.label+";\n";
+				$$.traducao="";
 				$$.label="";
 			}
-			|TK_TIPO TK_ID TK_IGUAL E ';'{
+			|TK_TIPO TK_ID TK_IGUAL CALC ';'{
 				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
 				variavel.nomeVariavel=$2.label;
 				variavel.tipoVariavel=$1.tipo;
+				variavel.temp=false;
 				tabelaSimbolos.push_back(variavel);
-				$$.traducao="\t"+variavel.tipoVariavel+" "+$2.label+";\n"+$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
-			|TK_ID TK_IGUAL E ';'{
+			|TK_ID TK_IGUAL CALC ';'{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
-
-E 			: E '+' E
+CALC			: CALC'+' CALC
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+
-				$1.traducao + $3.traducao +
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao = $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
-			|E '*' E
+			|CALC '*' CALC
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+ $1.traducao + $3.traducao +
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao = $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
-			|E '-' E
+			|CALC '-' CALC
 			{
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+$1.traducao + $3.traducao +
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao =$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
-			|E '/' E
+			|CALC '/' CALC
 			{
 
 				$$.label=GerarRegistrador();
-				$$.traducao = "\t"+$$.tipo+" "+$$.label+";\n"+$1.traducao + $3.traducao +
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao =$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
-			| TK_NUM
+			|ELEMENTS{}
+ELEMENTS:        TK_NUM
 			{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			|TK_REAL{
 				$$.tipo="float";
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
-				cout<<$1.label<<endl;
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
-				$$.traducao ="\t"+$$.tipo+" "+$$.label+";\n"+"\t"+ $$.label+" = " + $1.label + ";\n";
+				TIPO_SIMBOLO temp;
+				temp.tipoVariavel=$$.tipo;
+				temp.nomeVariavel=$$.label;
+				temp.temp=true;
+				tabelaSimbolos.push_back(temp);
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			;
 
@@ -148,7 +187,7 @@ TIPO_SIMBOLO verificaExistencia(string nome){
 		bool encontrei=false;
 		TIPO_SIMBOLO valor;
 		for(int i=0;i<tabelaSimbolos.size();i++){
-			if(tabelaSimbolos[i].nomeVariavel.compare(nome)==0){
+			if(!tabelaSimbolos[i].temp&&(tabelaSimbolos[i].nomeVariavel.compare(nome)==0)){
 				valor=tabelaSimbolos[i];
 				encontrei=true;
 			}
@@ -162,7 +201,7 @@ TIPO_SIMBOLO verificaDeclaracao(string nome){
 		bool encontrei=false;
 		TIPO_SIMBOLO variavel;
 		for(int i=0;i<tabelaSimbolos.size();i++){
-			if(tabelaSimbolos[i].nomeVariavel.compare(nome)==0){
+			if(!tabelaSimbolos[i].temp&&(tabelaSimbolos[i].nomeVariavel.compare(nome)==0)){
 				variavel=tabelaSimbolos[i];
 				encontrei=true;
 						
