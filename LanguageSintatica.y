@@ -24,11 +24,12 @@ int yylex(void);
 string GerarRegistrador();
 TIPO_SIMBOLO verificaDeclaracao(string nome);
 TIPO_SIMBOLO verificaExistencia(string nome);
+void insereTabela(string nome, string tipo,bool temp);
 void yyerror(string);
 %}
 
-%token TK_NUM TK_REAL
-%token TK_MAIN TK_ID TK_INT TK_FLOAT
+%token TK_NUM TK_REAL TK_STRING
+%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -66,24 +67,25 @@ TK_TIPO:    TK_INT{
 			| TK_FLOAT{
 				$$.tipo="float";
 			}
+			|TK_STRING{
+				$$.tipo="string";
+			}
 COMANDO 	:
 			 /* E ';' */
 			/* | */
 			 TK_TIPO TK_ID ';'{
-				TIPO_SIMBOLO valor=verificaExistencia($2.label);
-				valor.nomeVariavel=$2.label;
-				valor.tipoVariavel=$1.tipo;
-				valor.temp=false;
-				tabelaSimbolos.push_back(valor);
+				verificaExistencia($2.label);
+				insereTabela($2.label,$1.tipo,false);
+				// valor.nomeVariavel=$2.label;
+				// valor.tipoVariavel=$1.tipo;
+				// valor.temp=false;
+				// tabelaSimbolos.push_back(valor);
 				$$.traducao="";
 				$$.label="";
 			}
 			|TK_TIPO TK_ID TK_IGUAL CALC ';'{
-				TIPO_SIMBOLO variavel=verificaExistencia($2.label);
-				variavel.nomeVariavel=$2.label;
-				variavel.tipoVariavel=$1.tipo;
-				variavel.temp=false;
-				tabelaSimbolos.push_back(variavel);
+				verificaExistencia($2.label);
+				insereTabela($2.label,$1.tipo,false);
 				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
 			|TK_ID TK_IGUAL CALC ';'{
@@ -94,33 +96,21 @@ COMANDO 	:
 CALC			: CALC'+' CALC
 			{
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao = $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
 			|CALC '*' CALC
 			{
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao = $1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
 			|CALC '-' CALC
 			{
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao =$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
@@ -128,11 +118,7 @@ CALC			: CALC'+' CALC
 			{
 
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao =$1.traducao + $3.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
@@ -141,32 +127,27 @@ ELEMENTS:        TK_NUM
 			{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			|TK_REAL{
 				$$.tipo="float";
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
+				
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			| TK_ID{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$$.tipo=variavel.tipoVariavel;
 				$$.label=GerarRegistrador();
-				TIPO_SIMBOLO temp;
-				temp.tipoVariavel=$$.tipo;
-				temp.nomeVariavel=$$.label;
-				temp.temp=true;
-				tabelaSimbolos.push_back(temp);
+				insereTabela($$.label,$$.tipo,true);
+				
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}|TK_FRASE{
+				$$.tipo="string";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true);
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			;
@@ -217,6 +198,13 @@ string GerarRegistrador(){
 	/* string s(1,registrador); */
 	string s="temp"+std::to_string(registrador);
 	return s;
+}
+void insereTabela(string nome, string tipo,bool b){
+		TIPO_SIMBOLO temp;
+		temp.tipoVariavel=tipo;
+		temp.nomeVariavel=nome;
+		temp.temp=b;
+		tabelaSimbolos.push_back(temp);
 }
 
 void yyerror( string MSG )
