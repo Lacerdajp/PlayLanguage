@@ -7,12 +7,12 @@
 
 using namespace std;
 int registrador=0;
-struct atributos
+typedef struct atributos
 {
 	string label;
 	string traducao;
 	string tipo;
-};
+}atributos;
 typedef struct {
 	string nomeVariavel;
 	string tipoVariavel;
@@ -22,6 +22,7 @@ typedef struct {
 vector<TIPO_SIMBOLO> tabelaSimbolos;
 int yylex(void);
 string GerarRegistrador();
+atributos verificacaoTipos(atributos elemen1,char operador,atributos elemen2);
 TIPO_SIMBOLO verificaDeclaracao(string nome);
 TIPO_SIMBOLO verificaExistencia(string nome);
 void insereTabela(string nome, string tipo,bool temp);
@@ -86,40 +87,61 @@ COMANDO 	:
 			|TK_TIPO TK_ID TK_IGUAL CALC ';'{
 				verificaExistencia($2.label);
 				insereTabela($2.label,$1.tipo,false);
-				$$.traducao=$2.traducao+$4.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				$2.tipo=$1.tipo;
+				atributos elemento=verificacaoTipos($2,'=',$4);
+				if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao=elemento.traducao+"\t"+$2.label+"="+$4.label+";\n";
 			}
 			|TK_ID TK_IGUAL CALC ';'{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
-				$$.traducao=$1.traducao+$3.traducao+"\t"+$1.label+"="+$3.label+";\n";
+				$1.tipo=variavel.tipoVariavel;
+				atributos elemento=verificacaoTipos($1,'=',$3);
+				if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao=elemento.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
 CALC			: CALC'+' CALC
 			{
+				atributos elemento=verificacaoTipos($1,'+',$3);
 				$$.label=GerarRegistrador();
+				$$.tipo=elemento.tipo;
 				insereTabela($$.label,$$.tipo,true);
-				$$.traducao = $1.traducao + $3.traducao +
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
 			|CALC '*' CALC
 			{
+				atributos elemento=verificacaoTipos($1,'*',$3);
 				$$.label=GerarRegistrador();
+				$$.tipo=elemento.tipo;
 				insereTabela($$.label,$$.tipo,true);
-				$$.traducao = $1.traducao + $3.traducao +
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
 			|CALC '-' CALC
 			{
+				atributos elemento=verificacaoTipos($1,'-',$3);
 				$$.label=GerarRegistrador();
+				$$.tipo=elemento.tipo;
 				insereTabela($$.label,$$.tipo,true);
-				$$.traducao =$1.traducao + $3.traducao +
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
 			|CALC '/' CALC
 			{
-
+				atributos elemento=verificacaoTipos($1,'/',$3);
 				$$.label=GerarRegistrador();
+				$$.tipo=elemento.tipo;
 				insereTabela($$.label,$$.tipo,true);
-				$$.traducao =$1.traducao + $3.traducao +
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
 			|ELEMENTS{}
@@ -164,6 +186,33 @@ int main( int argc, char* argv[] )
 
 	return 0;
 }
+ atributos verificacaoTipos(atributos elemen1,char operador ,atributos elemen2){
+	if(elemen1.tipo==elemen2.tipo){
+		atributos elemento;
+		elemento.tipo=elemen1.tipo;
+		elemento.label="";	
+		elemento.traducao=elemen1.traducao+elemen2.traducao;
+		return elemento;
+	} else if(elemen1.tipo=="float" && elemen2.tipo=="int"){
+		atributos elemento;
+		elemento.tipo="float";
+		elemento.label=GerarRegistrador();
+		elemento.traducao=elemen1.traducao+elemen2.traducao+"\t"+elemento.label+"= ("+elemento.tipo+")"+elemen2.label+";\n";
+		insereTabela(elemento.label,elemento.tipo,true);
+		return elemento;
+		
+	}else if(operador!='='&&(elemen1.tipo=="int" && elemen2.tipo=="float")){
+		atributos elemento;
+		elemento.tipo="float";
+		elemento.label=GerarRegistrador();
+		elemento.traducao=elemen1.traducao+elemen2.traducao+"\t"+elemento.label+"= ("+elemento.tipo+")"+elemen1.label+";\n";
+		insereTabela(elemento.label,elemento.tipo,true);
+		return elemento;
+		
+	}else{
+		yyerror("Tipagem errada");
+	}
+} 
 TIPO_SIMBOLO verificaExistencia(string nome){
 		bool encontrei=false;
 		TIPO_SIMBOLO valor;
