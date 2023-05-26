@@ -147,7 +147,15 @@ CALC			: CALC'+' CALC
 				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
 			}
-			|ELEMENTS{}
+			|CONVERSION
+CONVERSION:    ELEMENTS{}
+			|'('TK_TIPO')'ELEMENTS{
+				$4.tipo=$2.tipo;
+				$$.tipo=$2.tipo;
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true);
+				$$.traducao=$4.traducao+"\t"+$$.label+"=("+$2.tipo+")"+$4.label+";\n";
+			}
 ELEMENTS:        TK_NUM
 			{
 				$$.tipo="int";
