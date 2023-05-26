@@ -1,7 +1,12 @@
 int main()
 {
 	float b;
-	b=1*1.0;
+	int a;
+
+	a = 2;
+	b = 3.5;
+
+	b = a/b;
 	
 	
 }

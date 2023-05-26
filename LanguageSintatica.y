@@ -30,7 +30,7 @@ void yyerror(string);
 %}
 
 %token TK_NUM TK_REAL TK_STRING
-%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE
+%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOLEAN
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -70,6 +70,9 @@ TK_TIPO:    TK_INT{
 			}
 			|TK_STRING{
 				$$.tipo="string";
+			}
+			|TK_BOOLEAN{
+				$$.tipo="boolean";
 			}
 COMANDO 	:
 			 /* E ';' */
