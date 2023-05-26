@@ -26,6 +26,8 @@ ID {LETRA}({LETRA}|{NUM})*
 "int"		{return TK_INT;}
 "float"     {return TK_FLOAT;}
 "string"     {return TK_STRING;}
+"boolean"     {return TK_BOOLEAN;}
+
 [(){}[\];,]	{ return *yytext; }
 
 [+\-*/]		{ return *yytext; }
