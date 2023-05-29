@@ -1,10 +1,7 @@
 int main()
 {
-	bool b;
-	int a;
-
-	a = 2;
-	b = (bool)a;
+	float a;
+	a=1.0;
 	
 	
 }
