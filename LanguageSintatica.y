@@ -161,7 +161,17 @@ RELACION:      CALC OPRELACION CALC{
 				$$.traducao=$2.traducao;
 			}
 
-			
+BOOL : TK_TRUE{
+				$$.tipo="bool";
+				$$.label="true";
+				$$.traducao="";
+			}
+			|TK_FALSE{
+				$$.tipo="bool";
+				$$.label="false";
+				$$.traducao="";
+			}
+					
 CALC			: CALC'+'CALC
 			{
 				atributos elemento=verificacaoTipos($1,"+",$3);
