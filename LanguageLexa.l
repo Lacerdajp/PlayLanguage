@@ -9,8 +9,8 @@ LETRA [A-Za-z_]
 
 DELIM {ESPACO}+
 NUM {DIGITO}+
-INT ([-])?{NUM}
-REAL {INT}+("."{NUM}+)?
+INT {NUM}
+REAL {INT}+("."{NUM}+)
 CHAR \'({LETRA}|{NUM})\'
 STRING\'({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+\'
 ID {LETRA}({LETRA}|{NUM})*

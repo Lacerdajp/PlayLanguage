@@ -38,6 +38,7 @@ void yyerror(string);
 
 %left '+' '-'
 %left '*' '/'
+
 %%
 
 S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
@@ -109,7 +110,7 @@ COMANDO 	:
 				$$.traducao=elemento.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			;
-CALC			: CALC'+' CALC
+CALC			: CALC'+'CALC
 			{
 				atributos elemento=verificacaoTipos($1,'+',$3);
 				$$.label=GerarRegistrador();
@@ -120,8 +121,9 @@ CALC			: CALC'+' CALC
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
-			|CALC '*' CALC
+			|CALC'*'CALC
 			{
+				cout<<$1.label +" "+$2.label<<endl;
 				atributos elemento=verificacaoTipos($1,'*',$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -131,8 +133,8 @@ CALC			: CALC'+' CALC
 				$$.traducao = elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
-			|CALC '-' CALC
-			{
+			|CALC'-'CALC
+			{   
 				atributos elemento=verificacaoTipos($1,'-',$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -142,7 +144,7 @@ CALC			: CALC'+' CALC
 				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
-			|CALC '/' CALC
+			|CALC'/'CALC
 			{
 				atributos elemento=verificacaoTipos($1,'/',$3);
 				$$.label=GerarRegistrador();
@@ -152,6 +154,10 @@ CALC			: CALC'+' CALC
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
+			}|'('CALC')'{
+				$$.tipo=$2.tipo;
+				$$.label=$2.label;
+				$$.traducao=$2.traducao;
 			}
 			|CONVERSION
 CONVERSION:    ELEMENTS{}
@@ -168,6 +174,13 @@ ELEMENTS:        TK_NUM
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}
+			|  '-'TK_NUM
+			{
+				$$.tipo="int";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " +"-" +$2.label + ";\n";
 			}
 			|TK_REAL{
 				$$.tipo="float";
@@ -227,6 +240,7 @@ int main( int argc, char* argv[] )
 		return elemento;
 		
 	}else{
+		cout<<elemen1.tipo +" "+elemen2.tipo<<endl;
 		yyerror("Tipagem errada");
 	}
 } 
