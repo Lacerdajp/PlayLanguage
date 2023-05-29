@@ -1,8 +1,7 @@
 #include<stdio.h>
 int main(void)
 {
-        int b;
-	b=2+1+-5;
-        printf("%d",b);
+        float b=1>2;
+        printf("%f",b);
         return 0;
 }

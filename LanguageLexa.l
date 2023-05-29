@@ -29,9 +29,14 @@ ID {LETRA}({LETRA}|{NUM})*
 "bool"     {return TK_BOOL;}
 
 [(){}[\];,]	{ return *yytext; }
-
+(<|>)	{ return *yytext; }
 [+\-*/]		{ return *yytext; }
 "="         {return TK_IGUAL;}
+">="    {return TK_MAIOR_IGUAL;}
+"<="    {return TK_MENOR_IGUAL;}
+"=="        {return TK_IGUALDADE;;}
+"==="       {return TK_IDENTICO;}
+"!="        {return TK_DIFERENTE;;}
 {INT}		{ yylval.label = yytext; return TK_NUM; }
 {REAL}      { yylval.label = yytext; return TK_REAL;}
 {STRING}      { yylval.label = yytext; return TK_FRASE;}

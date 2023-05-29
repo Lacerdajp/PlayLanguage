@@ -1,7 +1,7 @@
 int main()
 {
-	float a;
-	a=(2.0-1)*3;
+	float a ;
+	a=(1.0>=-1);
 	
 	
 }
