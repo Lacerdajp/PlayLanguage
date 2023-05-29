@@ -1,3 +1,5 @@
+//IMPLEMENTE O TIPO BOOL
+
 %{
 #include <iostream>
 #include <string>
@@ -12,6 +14,7 @@ typedef struct atributos
 	string label;
 	string traducao;
 	string tipo;
+
 }atributos;
 typedef struct {
 	string nomeVariavel;
@@ -32,7 +35,7 @@ void yyerror(string);
 
 %token TK_NUM TK_REAL TK_STRING
 %token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE;
-%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL
+%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -76,6 +79,7 @@ TK_TIPO:    TK_INT{
 			}
 			|TK_BOOL{
 				$$.tipo="bool";
+
 			}
 COMANDO 	:
 			 /* E ';' */
@@ -113,6 +117,7 @@ COMANDO 	:
 			|RELACION';'{
 				
 			}
+
 OPERATIONS: RELACION 
 			|CALC
 OPRELACION: '>'{
@@ -136,6 +141,7 @@ OPRELACION: '>'{
 			|TK_DIFERENTE{
 				$$.label="!=";
 			}
+
 			
 RELACION:      CALC OPRELACION CALC{
 				
@@ -148,11 +154,13 @@ RELACION:      CALC OPRELACION CALC{
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
 			}
+
 			|'('RELACION')'{
 				$$.tipo=$2.tipo;
 				$$.label=$2.label;
 				$$.traducao=$2.traducao;
 			}
+
 			
 CALC			: CALC'+'CALC
 			{
@@ -165,6 +173,7 @@ CALC			: CALC'+'CALC
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
 			}
+			
 			|CALC'*'CALC
 			{
 				cout<<$1.label +" "+$2.label<<endl;
@@ -242,6 +251,12 @@ ELEMENTS:        TK_NUM
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}|TK_FRASE{
 				$$.tipo="string";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}
+			|TK_BOOL{
+				$$.tipo="bool";
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
