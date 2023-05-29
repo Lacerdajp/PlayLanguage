@@ -41,6 +41,10 @@ ID {LETRA}({LETRA}|{NUM})*
 {REAL}      { yylval.label = yytext; return TK_REAL;}
 {STRING}      { yylval.label = yytext; return TK_FRASE;}
 {ID}		{ yylval.label = yytext; return TK_ID; }
+{CHAR}      { yylval.label = yytext; return TK_CHAR;}
+
+"true" {return TK_TRUE;}
+"false" {return TK_FALSE;}
 
 .			{ *yytext; }
 
