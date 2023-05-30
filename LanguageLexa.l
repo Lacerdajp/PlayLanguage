@@ -12,7 +12,7 @@ NUM {DIGITO}+
 INT {NUM}
 REAL {INT}+("."{NUM}+)
 CHAR \'({LETRA}|{NUM})\'
-STRING\'({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+\'
+STRING\'(({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+)?\'
 ID {LETRA}({LETRA}|{NUM})*
 
 %%
@@ -40,10 +40,11 @@ ID {LETRA}({LETRA}|{NUM})*
 {INT}		{ yylval.label = yytext; return TK_NUM; }
 {REAL}      { yylval.label = yytext; return TK_REAL;}
 {STRING}      { yylval.label = yytext; return TK_FRASE;}
+"true"      {yylval.label = yytext;return TK_TRUE;}
+"false"     {yylval.label = yytext;return TK_FALSE;}
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
-"true" {return TK_TRUE;}
-"false" {return TK_FALSE;}
+
 
 .			{ *yytext; }
 

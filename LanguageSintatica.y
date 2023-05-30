@@ -55,7 +55,12 @@ BLOCO		: '{' COMANDOS '}'
 			{
 				string declaracoes="";
 				for(TIPO_SIMBOLO atual: tabelaSimbolos){
-					declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
+					if(atual.tipoVariavel=="bool"){
+						declaracoes="\tint "+atual.nomeVariavel+";\n"+declaracoes;
+					}else{
+						declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
+					}
+					
 				}
 				$$.traducao = declaracoes+$2.traducao;
 			}
@@ -147,7 +152,7 @@ RELACION:      CALC OPRELACION CALC{
 				
 				atributos elemento=verificacaoTipos($1,$2.label,$3);
 				$$.label=GerarRegistrador();
-				$$.tipo=elemento.tipo;
+				$$.tipo="bool";
 				insereTabela($$.label,$$.tipo,true,"");
 				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
@@ -159,17 +164,6 @@ RELACION:      CALC OPRELACION CALC{
 				$$.tipo=$2.tipo;
 				$$.label=$2.label;
 				$$.traducao=$2.traducao;
-			}
-
-BOOL : TK_TRUE{
-				$$.tipo="bool";
-				$$.label="true";
-				$$.traducao="";
-			}
-			|TK_FALSE{
-				$$.tipo="bool";
-				$$.label="false";
-				$$.traducao="";
 			}
 					
 CALC			: CALC'+'CALC
@@ -251,6 +245,24 @@ ELEMENTS:        TK_NUM
 				insereTabela($$.label,$$.tipo,true,"");
 				
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}|TK_FRASE{
+				$$.tipo="string";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}
+			|TK_TRUE{
+				$$.tipo="bool";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " + "1"+ ";\n";
+				cout<<$$.traducao<<endl;
+			}
+			|TK_FALSE{
+				$$.tipo="bool";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " + "0"+ ";\n";
 			}
 			| TK_ID{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
@@ -258,17 +270,6 @@ ELEMENTS:        TK_NUM
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				
-				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
-			}|TK_FRASE{
-				$$.tipo="string";
-				$$.label=GerarRegistrador();
-				insereTabela($$.label,$$.tipo,true,"");
-				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
-			}
-			|TK_BOOL{
-				$$.tipo="bool";
-				$$.label=GerarRegistrador();
-				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
 			;
@@ -340,7 +341,8 @@ TIPO_SIMBOLO verificaDeclaracao(string nome){
 			}
 		}
 		if(!encontrei){
-			yyerror("Você não declarou a varivel 1");
+			cout<<nome<<endl;
+			yyerror("Você não declarou a varivel");
 		}
 		return variavel;
 }
