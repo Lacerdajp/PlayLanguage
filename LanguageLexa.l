@@ -26,6 +26,7 @@ ID {LETRA}({LETRA}|{NUM})*
 "int"		{return TK_INT;}
 "float"     {return TK_FLOAT;}
 "string"     {return TK_STRING;}
+"char"      {return TK_CHAR;}
 "bool"     {return TK_BOOL;}
 
 [(){}[\];,]	{ return *yytext; }
@@ -42,6 +43,7 @@ ID {LETRA}({LETRA}|{NUM})*
 "!"         {return TK_NEGACAO;}
 {INT}		{ yylval.label = yytext; return TK_NUM; }
 {REAL}      { yylval.label = yytext; return TK_REAL;}
+{CHAR}      { yylval.label = yytext; return TK_CHARACTER;}
 {STRING}      { yylval.label = yytext; return TK_FRASE;}
 "true"      {yylval.label = yytext;return TK_TRUE;}
 "false"     {yylval.label = yytext;return TK_FALSE;}

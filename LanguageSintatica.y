@@ -33,14 +33,15 @@ void insereTabela(string nome, string tipo,bool temp,string nomeFantasia);
 void yyerror(string);
 %}
 
-%token TK_NUM TK_REAL TK_STRING
+%token TK_NUM TK_REAL TK_STRING TK_CHARACTER
 %token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE
-%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE
+%token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE TK_CHAR
 %token TK_OU  TK_E  TK_NEGACAO
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
 
+%left TK_E TK_OU TK_NEGACAO
 %left '+' '-'
 %left '*' '/'
 
@@ -79,6 +80,9 @@ TK_TIPO:    TK_INT{
 			}
 			| TK_FLOAT{
 				$$.tipo="float";
+			}
+			|TK_CHAR{
+				$$.tipo="char";
 			}
 			|TK_STRING{
 				$$.tipo="string";
@@ -133,7 +137,6 @@ OPLOGIC: TK_OU{
 			$$.label="&&";
 		}
 LOGIC:		LOGIC OPLOGIC  LOGIC{
-				cout<<$2.label<<endl;
 				atributos elemento=verificacaoTipos($1,$2.label,$3);
 				$$.label=GerarRegistrador();
 				$$.tipo="bool";
@@ -174,13 +177,25 @@ LOGIC:		LOGIC OPLOGIC  LOGIC{
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
 			}
 			|TK_NEGACAO LOGIC{
-
+				atributos elemento=verificacaoTipos($2,"!",$2);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = !"+$2.label+" ;\n";
+			}
+			|TK_NEGACAO CALC{
+				atributos elemento=verificacaoTipos($2,"!",$2);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = !"+$2.label+" ;\n";
 			}
 			|RELACION{
 				$$.label=$1.label;
 				$$.tipo=$1.tipo;
 				$$.traducao=$$.traducao;
-				cout<<$$.traducao<<endl;
 			}
 			|'('LOGIC')'{
 				$$.tipo=$2.tipo;
@@ -236,7 +251,6 @@ CALC			: CALC'+'CALC
 			
 			|CALC'*'CALC
 			{
-				cout<<$1.label +" "+$2.label<<endl;
 				atributos elemento=verificacaoTipos($1,"*",$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -301,7 +315,14 @@ ELEMENTS:        TK_NUM
 				insereTabela($$.label,$$.tipo,true,"");
 				
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
-			}|TK_FRASE{
+			}
+			|TK_CHARACTER{
+				$$.tipo="char";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"");
+				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+			}
+			|TK_FRASE{
 				$$.tipo="string";
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
@@ -312,14 +333,12 @@ ELEMENTS:        TK_NUM
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + "1"+ ";\n";
-				cout<<$$.traducao<<endl;
 			}
 			|TK_FALSE{
 				$$.tipo="bool";
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + "0"+ ";\n";
-				cout<<$$.traducao<<endl;
 			}
 			| TK_ID{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
@@ -348,7 +367,7 @@ int main( int argc, char* argv[] )
 	(operador=="+"&&elemen1.tipo==elemen2.tipo&&(
 	(elemen1.tipo=="string")||(elemen1.tipo=="int")||(elemen1.tipo=="float"))
 	)||
-	(((operador!="=")&&(operador!="+")&&(operador!="||")&&(operador!="&&"))
+	(((operador!="=")&&(operador!="+")&&(operador!="||")&&(operador!="&&")&&(operador!="!"))
 	&&elemen1.tipo==elemen2.tipo&&(
 	(elemen1.tipo=="int")||(elemen1.tipo=="float"))
 	)||
@@ -359,7 +378,14 @@ int main( int argc, char* argv[] )
 		elemento.label="";	
 		elemento.traducao=elemen1.traducao+elemen2.traducao;
 		return elemento;
-	} else if(((operador!="&&")&&(operador!="||"))&&(elemen1.tipo=="float" && elemen2.tipo=="int")){
+	}else if((operador=="!")&&elemen1.tipo==elemen2.tipo&&(elemen1.tipo=="bool"))
+	{
+		atributos elemento;
+		elemento.tipo=elemen1.tipo;
+		elemento.label="";	
+		elemento.traducao=elemen1.traducao;
+		return elemento;
+	} else if(((operador!="&&")&&(operador!="||")&&(operador!="!"))&&(elemen1.tipo=="float" && elemen2.tipo=="int")){
 		atributos elemento;
 		elemento.tipo="float";
 		elemento.label=GerarRegistrador();
@@ -367,7 +393,7 @@ int main( int argc, char* argv[] )
 		insereTabela(elemento.label,elemento.tipo,true,"");
 		return elemento;
 		
-	}else if((operador!="="&&(operador!="&&")&&(operador!="||"))&&(elemen1.tipo=="int" && elemen2.tipo=="float")){
+	}else if((operador!="="&&(operador!="&&")&&(operador!="!")&&(operador!="||"))&&(elemen1.tipo=="int" && elemen2.tipo=="float")){
 		atributos elemento;
 		elemento.tipo="float";
 		elemento.label=GerarRegistrador();
