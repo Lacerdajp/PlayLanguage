@@ -34,8 +34,9 @@ void yyerror(string);
 %}
 
 %token TK_NUM TK_REAL TK_STRING
-%token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE;
+%token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE
 %token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE
+%token TK_OU  TK_E  TK_NEGACAO
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -119,12 +120,73 @@ COMANDO 	:
 				if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao=elemento.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
-			|RELACION';'{
+			|LOGIC';'{
 				
 			}
 
-OPERATIONS: RELACION 
+OPERATIONS: LOGIC
 			|CALC
+OPLOGIC: TK_OU{
+			$$.label="||";
+		}
+		| TK_E{
+			$$.label="&&";
+		}
+LOGIC:		LOGIC OPLOGIC  LOGIC{
+				cout<<$2.label<<endl;
+				atributos elemento=verificacaoTipos($1,$2.label,$3);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
+			}
+			|CALC OPLOGIC  CALC{
+				atributos elemento=verificacaoTipos($1,$2.label,$3);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
+			}
+			|LOGIC OPLOGIC  CALC{
+				atributos elemento=verificacaoTipos($1,$2.label,$3);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
+			}
+			|CALC OPLOGIC  LOGIC{
+				atributos elemento=verificacaoTipos($1,$2.label,$3);
+				$$.label=GerarRegistrador();
+				$$.tipo="bool";
+				insereTabela($$.label,$$.tipo,true,"");
+				if ($1.tipo=="int"&&$3.tipo=="float") $1=elemento;
+				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				$$.traducao = elemento.traducao+
+				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
+			}
+			|TK_NEGACAO LOGIC{
+
+			}
+			|RELACION{
+				$$.label=$1.label;
+				$$.tipo=$1.tipo;
+				$$.traducao=$$.traducao;
+				cout<<$$.traducao<<endl;
+			}
+			|'('LOGIC')'{
+				$$.tipo=$2.tipo;
+				$$.label=$2.label;
+				$$.traducao=$2.traducao;
+			}
 OPRELACION: '>'{
 				$$.label=">";
 			}
@@ -158,12 +220,6 @@ RELACION:      CALC OPRELACION CALC{
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
-			}
-
-			|'('RELACION')'{
-				$$.tipo=$2.tipo;
-				$$.label=$2.label;
-				$$.traducao=$2.traducao;
 			}
 					
 CALC			: CALC'+'CALC
@@ -263,6 +319,7 @@ ELEMENTS:        TK_NUM
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + "0"+ ";\n";
+				cout<<$$.traducao<<endl;
 			}
 			| TK_ID{
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
@@ -287,13 +344,22 @@ int main( int argc, char* argv[] )
 	return 0;
 }
  atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
-	if(elemen1.tipo==elemen2.tipo){
+	if((operador=="="&&elemen1.tipo==elemen2.tipo)||
+	(operador=="+"&&elemen1.tipo==elemen2.tipo&&(
+	(elemen1.tipo=="string")||(elemen1.tipo=="int")||(elemen1.tipo=="float"))
+	)||
+	(((operador!="=")&&(operador!="+")&&(operador!="||")&&(operador!="&&"))
+	&&elemen1.tipo==elemen2.tipo&&(
+	(elemen1.tipo=="int")||(elemen1.tipo=="float"))
+	)||
+	(((operador=="&&")||(operador=="||"))&&elemen1.tipo==elemen2.tipo&&(elemen1.tipo=="bool"))
+	){
 		atributos elemento;
 		elemento.tipo=elemen1.tipo;
 		elemento.label="";	
 		elemento.traducao=elemen1.traducao+elemen2.traducao;
 		return elemento;
-	} else if(elemen1.tipo=="float" && elemen2.tipo=="int"){
+	} else if(((operador!="&&")&&(operador!="||"))&&(elemen1.tipo=="float" && elemen2.tipo=="int")){
 		atributos elemento;
 		elemento.tipo="float";
 		elemento.label=GerarRegistrador();
@@ -301,7 +367,7 @@ int main( int argc, char* argv[] )
 		insereTabela(elemento.label,elemento.tipo,true,"");
 		return elemento;
 		
-	}else if(operador!="="&&(elemen1.tipo=="int" && elemen2.tipo=="float")){
+	}else if((operador!="="&&(operador!="&&")&&(operador!="||"))&&(elemen1.tipo=="int" && elemen2.tipo=="float")){
 		atributos elemento;
 		elemento.tipo="float";
 		elemento.label=GerarRegistrador();

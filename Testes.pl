@@ -1,6 +1,6 @@
 int main()
 {
-	string a='';
+	bool a= 1.0>1||(true);
 	
 	
 }
