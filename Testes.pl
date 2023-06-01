@@ -1,7 +1,6 @@
 int main()
 {
-	char a;
-	a='a';
+	int a=(int)2.0+1;
 	
 	
 }

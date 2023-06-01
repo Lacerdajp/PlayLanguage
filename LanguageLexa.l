@@ -28,7 +28,7 @@ ID {LETRA}({LETRA}|{NUM})*
 "string"     {return TK_STRING;}
 "char"      {return TK_CHAR;}
 "bool"     {return TK_BOOL;}
-
+"var"       {return TK_VAR;}
 [(){}[\];,]	{ return *yytext; }
 (<|>)	{ return *yytext; }
 [+\-*/]		{ return *yytext; }

@@ -29,6 +29,7 @@ string GerarRegistrador();
 atributos verificacaoTipos(atributos elemen1,string operador,atributos elemen2);
 TIPO_SIMBOLO verificaDeclaracao(string nome);
 TIPO_SIMBOLO verificaExistencia(string nome);
+void alterarTabela(string nome,string tipo);
 void insereTabela(string nome, string tipo,bool temp,string nomeFantasia);
 void yyerror(string);
 %}
@@ -36,7 +37,7 @@ void yyerror(string);
 %token TK_NUM TK_REAL TK_STRING TK_CHARACTER
 %token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE
 %token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE TK_CHAR
-%token TK_OU  TK_E  TK_NEGACAO
+%token TK_OU  TK_E  TK_NEGACAO TK_VAR
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -57,6 +58,9 @@ BLOCO		: '{' COMANDOS '}'
 			{
 				string declaracoes="";
 				for(TIPO_SIMBOLO atual: tabelaSimbolos){
+					if(atual.tipoVariavel=="var"){
+						continue;
+					}
 					if(atual.tipoVariavel=="bool"){
 						declaracoes="\tint "+atual.nomeVariavel+";\n"+declaracoes;
 					}else{
@@ -90,6 +94,8 @@ TK_TIPO:    TK_INT{
 			|TK_BOOL{
 				$$.tipo="bool";
 
+			}|TK_VAR{
+				$$.tipo="var";
 			}
 COMANDO 	:
 			 /* E ';' */
@@ -363,7 +369,7 @@ int main( int argc, char* argv[] )
 	return 0;
 }
  atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
-	if((operador=="="&&elemen1.tipo==elemen2.tipo)||
+	if((operador=="="&&elemen1.tipo==elemen2.tipo&&elemen1.tipo!="var")||
 	(operador=="+"&&elemen1.tipo==elemen2.tipo&&(
 	(elemen1.tipo=="string")||(elemen1.tipo=="int")||(elemen1.tipo=="float"))
 	)||
@@ -401,7 +407,16 @@ int main( int argc, char* argv[] )
 		insereTabela(elemento.label,elemento.tipo,true,"");
 		return elemento;
 		
-	}else{
+	}else if(operador=="="&&(elemen1.tipo=="var"&&elemen2.tipo!="var")){
+		alterarTabela(elemen1.label,elemen2.tipo);
+	}else if((operador!="="&&(elemen1.tipo=="var"&&elemen2.tipo!="var"))
+	||(operador=="="&&(elemen1.tipo!="var"&&elemen2.tipo=="var"))
+	||(operador!="="&&(elemen1.tipo!="var"&&elemen2.tipo=="var"))
+	||(elemen1.tipo=="var"&&elemen2.tipo=="var")
+	){
+		yyerror("Você nao atribuiu nenhum tipo ao operador var");
+	}
+	else{
 		cout<<elemen1.tipo +" "+elemen2.tipo<<endl;
 		yyerror("Tipagem errada");
 	}
@@ -443,6 +458,14 @@ string GerarRegistrador(){
 	/* string s(1,registrador); */
 	string s="temp"+std::to_string(registrador);
 	return s;
+}
+void alterarTabela(string nome,string tipo){
+	TIPO_SIMBOLO variavel;
+		for(int i=0;i<tabelaSimbolos.size();i++){
+			if(!tabelaSimbolos[i].temp&&(tabelaSimbolos[i].nomeVariavel.compare(nome)==0)){
+				tabelaSimbolos[i].tipoVariavel=tipo;
+			}
+		}
 }
 void insereTabela(string nome, string tipo,bool b,string nomeFantasia){
 		TIPO_SIMBOLO temp;
