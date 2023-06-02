@@ -1,6 +1,5 @@
 int main()
 {
-	int a=(int)2.0+1;
-	
+    var a=3.0+1;
 	
 }

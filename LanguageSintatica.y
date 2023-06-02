@@ -409,6 +409,11 @@ int main( int argc, char* argv[] )
 		
 	}else if(operador=="="&&(elemen1.tipo=="var"&&elemen2.tipo!="var")){
 		alterarTabela(elemen1.label,elemen2.tipo);
+		atributos elemento;
+		elemento.tipo=elemen2.tipo;
+		elemento.label="";	
+		elemento.traducao=elemen1.traducao+elemen2.traducao;
+		return elemento;
 	}else if((operador!="="&&(elemen1.tipo=="var"&&elemen2.tipo!="var"))
 	||(operador=="="&&(elemen1.tipo!="var"&&elemen2.tipo=="var"))
 	||(operador!="="&&(elemen1.tipo!="var"&&elemen2.tipo=="var"))
