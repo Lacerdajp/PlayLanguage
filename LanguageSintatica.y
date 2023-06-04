@@ -377,7 +377,7 @@ int main( int argc, char* argv[] )
 	&&elemen1.tipo==elemen2.tipo&&(
 	(elemen1.tipo=="int")||(elemen1.tipo=="float"))
 	)||
-	((operador=="=="||operador=="!=")&&elemen1.tipo==elemen2.tipo&&
+	((operador=="=="||operador=="!="||operador=="===")&&elemen1.tipo==elemen2.tipo&&
 	(elemen1.tipo=="string"||elemen1.tipo=="bool"||elemen1.tipo=="char"))||
 	(((operador=="&&")||(operador=="||"))&&elemen1.tipo==elemen2.tipo&&(elemen1.tipo=="bool"))
 	){
