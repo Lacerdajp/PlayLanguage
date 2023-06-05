@@ -352,7 +352,7 @@ ELEMENTS:        TK_NUM
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				
-				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
+				$$.traducao ="\t"+ $$.label+" = " +variavel.nomeVariavel + ";\n";
 			}
 			;
 
