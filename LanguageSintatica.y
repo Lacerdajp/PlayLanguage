@@ -24,12 +24,17 @@ typedef struct {
 }TIPO_SIMBOLO;
 
 vector<TIPO_SIMBOLO> tabelaSimbolos;
+vector<vector<TIPO_SIMBOLO>> pilhaTabela;
 int yylex(void);
 string GerarRegistrador();
+
+string imprimirDeclaracaoVariavel();
 atributos verificacaoTipos(atributos elemen1,string operador,atributos elemen2);
 TIPO_SIMBOLO verificaDeclaracao(string nome);
 TIPO_SIMBOLO verificaExistencia(string nome);
+void inserirPilha(vector<TIPO_SIMBOLO> tabela);
 void alterarTabela(string nome,string tipo);
+void zerarTabela();
 void insereTabela(string nome, string tipo,bool temp,string nomeFantasia);
 void yyerror(string);
 %}
@@ -51,25 +56,21 @@ void yyerror(string);
 S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
 			{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
+			}| BLOCO{
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+$1.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
 
-BLOCO		: '{' COMANDOS '}'
+BLOCO		:  COMANDOS 
 			{
-				string declaracoes="";
-				for(TIPO_SIMBOLO atual: tabelaSimbolos){
-					if(atual.tipoVariavel=="var"){
-						continue;
-					}
-					if(atual.tipoVariavel=="bool"){
-						declaracoes="\tint "+atual.nomeVariavel+";\n"+declaracoes;
-					}else{
-						declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
-					}
-					
-				}
-				$$.traducao = declaracoes+$2.traducao;
+				inserirPilha(tabelaSimbolos);
+				zerarTabela();
+				$$.traducao = $1.traducao;
 			}
+			|BLOCO '{' BLOCO BLOCO '}'BLOCO{
+				$$.traducao=$4.traducao+ $1.traducao+$3.traducao+$6.traducao;
+			}
+
 			;
 
 COMANDOS	: COMANDO COMANDOS{
@@ -368,6 +369,22 @@ int main( int argc, char* argv[] )
 
 	return 0;
 }
+string imprimirDeclaracaoVariavel(){
+	string declaracoes="";
+	for(vector<TIPO_SIMBOLO> tabela:pilhaTabela)
+		for(TIPO_SIMBOLO atual: tabela){
+					if(atual.tipoVariavel=="var"){
+						continue;
+					}
+					if(atual.tipoVariavel=="bool"){
+						declaracoes="\tint "+atual.nomeVariavel+";\n"+declaracoes;
+					}else{
+						declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
+					}
+					
+				}
+	return declaracoes;
+}
  atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
 	if((operador=="="&&elemen1.tipo==elemen2.tipo&&elemen1.tipo!="var")||
 	(operador=="+"&&elemen1.tipo==elemen2.tipo&&(
@@ -466,6 +483,9 @@ string GerarRegistrador(){
 	string s="temp"+std::to_string(registrador);
 	return s;
 }
+void inserirPilha(vector<TIPO_SIMBOLO> tabela){
+	pilhaTabela.push_back(tabela);
+}
 void alterarTabela(string nome,string tipo){
 	TIPO_SIMBOLO variavel;
 		for(int i=0;i<tabelaSimbolos.size();i++){
@@ -481,6 +501,11 @@ void insereTabela(string nome, string tipo,bool b,string nomeFantasia){
 		temp.temp=b;
 		temp.nomeOriginal=nomeFantasia;
 		tabelaSimbolos.push_back(temp);
+}
+void zerarTabela(){
+	for(TIPO_SIMBOLO temp : tabelaSimbolos){
+		tabelaSimbolos.pop_back();
+	}
 }
 
 void yyerror( string MSG )
