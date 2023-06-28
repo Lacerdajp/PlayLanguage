@@ -22,17 +22,23 @@ typedef struct {
 	bool temp;
 	string nomeOriginal;
 }TIPO_SIMBOLO;
-
+typedef struct {
+	string nome;
+	string tipo;
+	
+}DECLARACAO;
+vector<DECLARACAO> declaracoes;
 vector<TIPO_SIMBOLO> tabelaSimbolos;
 vector<vector<TIPO_SIMBOLO>> pilhaTabela;
 int yylex(void);
 string GerarRegistrador();
-
 string imprimirDeclaracaoVariavel();
+void insereDeclaracoes(vector<TIPO_SIMBOLO> tabela );
 atributos verificacaoTipos(atributos elemen1,string operador,atributos elemen2);
 TIPO_SIMBOLO verificaDeclaracao(string nome);
 TIPO_SIMBOLO verificaExistencia(string nome);
 void inserirPilha(vector<TIPO_SIMBOLO> tabela);
+void removerPilha();
 void alterarTabela(string nome,string tipo);
 void zerarTabela();
 void insereTabela(string nome, string tipo,bool temp,string nomeFantasia);
@@ -53,28 +59,53 @@ void yyerror(string);
 
 %%
 
-S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
+S 			: TK_TIPO TK_MAIN '(' ')' CHAVE_ENTRADA BLOCO CHAVE_SAIDA
 			{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}| BLOCO{
-				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+$1.traducao << "\treturn 0;\n}" << endl; 
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
-
-BLOCO		:  COMANDOS 
-			{
+CHAVE_ENTRADA	: '{'{
+				
 				inserirPilha(tabelaSimbolos);
+						// vector<TIPO_SIMBOLO>tabela=pilhaTabela.back();
+				//  insereDeclaracoes(tabela);
 				zerarTabela();
-				$$.traducao = $1.traducao;
+				}
+CHAVE_SAIDA	: '}'{
+				// vector<TIPO_SIMBOLO>tabela=pilhaTabela.back();
+				//  insereDeclaracoes(tabela);
+				zerarTabela();
+				 tabelaSimbolos=pilhaTabela.back();
+				 removerPilha();
+				 
+				}
+BLOCO		:  CHAVE_ENTRADA COMANDOS CHAVE_SAIDA
+			{
+				 //cout<<1<<endl;
+				$$.traducao = $2.traducao;
 			}
-			|BLOCO '{' BLOCO BLOCO '}'BLOCO{
-				$$.traducao=$4.traducao+ $1.traducao+$3.traducao+$6.traducao;
+			|COMANDOS BLOCO COMANDOS{
+				// cout<<2<<endl;
+				$$.traducao=$1.traducao+ $2.traducao+$3.traducao;
+			}
+			|CHAVE_ENTRADA BLOCO CHAVE_SAIDA
+			{
+				// cout<<3<<endl;
+				$$.traducao = $2.traducao;
+			}
+			|BLOCO BLOCO{
+				// cout<<4<<endl;
+				$$.traducao=$1.traducao+ $2.traducao;
 			}
 
 			;
 
 COMANDOS	: COMANDO COMANDOS{
-				$$.traducao=$1.traducao+$2.traducao;
+				// cout<< "X :"+ pilhaTabela.size()<<endl;
+				 insereDeclaracoes(tabelaSimbolos);
+				$$.traducao=$1.traducao+$2.traducao;		
 			}
 			|{
 				$$.traducao="";
@@ -370,20 +401,32 @@ int main( int argc, char* argv[] )
 	return 0;
 }
 string imprimirDeclaracaoVariavel(){
-	string declaracoes="";
-	for(vector<TIPO_SIMBOLO> tabela:pilhaTabela)
-		for(TIPO_SIMBOLO atual: tabela){
-					if(atual.tipoVariavel=="var"){
+	string declaracao="";
+	for(DECLARACAO atual: declaracoes){
+					if(atual.tipo=="var"){
 						continue;
 					}
-					if(atual.tipoVariavel=="bool"){
-						declaracoes="\tint "+atual.nomeVariavel+";\n"+declaracoes;
+					if(atual.tipo=="bool"){
+						declaracao="\tint "+atual.nome+";\n"+declaracao;
 					}else{
-						declaracoes="\t"+atual.tipoVariavel+" "+atual.nomeVariavel+";\n"+declaracoes;
+						declaracao="\t"+atual.tipo+" "+atual.nome+";\n"+declaracao;
 					}
 					
 				}
-	return declaracoes;
+	return declaracao;
+}
+void insereDeclaracoes(vector<TIPO_SIMBOLO> tabela ){
+	int flag=0;
+	for(TIPO_SIMBOLO atual:tabela){
+		DECLARACAO dec;
+		dec.nome=atual.nomeVariavel;
+		dec.tipo=atual.tipoVariavel;
+		for(DECLARACAO i:declaracoes){
+			if(dec.nome==i.nome)flag++;
+		}
+		if(flag==0) declaracoes.push_back(dec);
+		else flag--;
+	}
 }
  atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
 	if((operador=="="&&elemen1.tipo==elemen2.tipo&&elemen1.tipo!="var")||
@@ -485,6 +528,11 @@ string GerarRegistrador(){
 }
 void inserirPilha(vector<TIPO_SIMBOLO> tabela){
 	pilhaTabela.push_back(tabela);
+}
+void removerPilha(){
+	
+	pilhaTabela.pop_back();
+	
 }
 void alterarTabela(string nome,string tipo){
 	TIPO_SIMBOLO variavel;
