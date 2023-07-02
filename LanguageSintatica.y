@@ -59,10 +59,10 @@ void yyerror(string);
 
 %%
 
-S 			: TK_TIPO TK_MAIN '(' ')' BLOCO 
+S 			: TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION
 			{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $5.traducao << "\treturn 0;\n}" << endl; 
-			}| BLOCO{
+			}| INIT{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
@@ -81,25 +81,30 @@ CHAVE_SAIDA	: '}'{
 				 removerPilha();
 				 
 				}
-BLOCO		:  CHAVE_ENTRADA COMANDOS CHAVE_SAIDA
-			{
-				 //cout<<1<<endl;
+INIT: 		BLOCO	{
+				$$.traducao = $1.traducao;
+			}|
+			COMANDOS{
+				$$.traducao = $1.traducao;
+			}
+BLOCO_FUNCTION: 	CHAVE_ENTRADA INIT CHAVE_SAIDA{
+				// cout<<3<<endl;
 				$$.traducao = $2.traducao;
 			}
-			|COMANDOS BLOCO COMANDOS{
+			
+BLOCO		:  COMANDOS BLOCO COMANDOS{
 				// cout<<2<<endl;
 				$$.traducao=$1.traducao+ $2.traducao+$3.traducao;
 			}
-			|CHAVE_ENTRADA BLOCO CHAVE_SAIDA
+			|BLOCO_FUNCTION
 			{
 				// cout<<3<<endl;
-				$$.traducao = $2.traducao;
+				$$.traducao = $1.traducao;
 			}
 			|BLOCO BLOCO{
 				// cout<<4<<endl;
 				$$.traducao=$1.traducao+ $2.traducao;
 			}
-
 			;
 
 COMANDOS	: COMANDO COMANDOS{
@@ -107,7 +112,9 @@ COMANDOS	: COMANDO COMANDOS{
 				 insereDeclaracoes(tabelaSimbolos);
 				$$.traducao=$1.traducao+$2.traducao;		
 			}
+			
 			|{
+				// cout<<1 <<endl;
 				$$.traducao="";
 			}
 			;
