@@ -59,9 +59,9 @@ void yyerror(string);
 
 %%
 
-S 			: TK_TIPO TK_MAIN '(' ')' CHAVE_ENTRADA BLOCO CHAVE_SAIDA
+S 			: TK_TIPO TK_MAIN '(' ')' BLOCO 
 			{
-				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $5.traducao << "\treturn 0;\n}" << endl; 
 			}| BLOCO{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
 			}
@@ -507,11 +507,31 @@ TIPO_SIMBOLO verificaExistencia(string nome){
 TIPO_SIMBOLO verificaDeclaracao(string nome){
 		bool encontrei=false;
 		TIPO_SIMBOLO variavel;
+		
 		for(int i=0;i<tabelaSimbolos.size();i++){
-			if(!tabelaSimbolos[i].temp&&(tabelaSimbolos[i].nomeOriginal.compare(nome)==0)){
-				variavel=tabelaSimbolos[i];
+			if(!tabelaSimbolos.at(i).temp&&(tabelaSimbolos.at(i).nomeOriginal.compare(nome)==0)){
+				variavel=tabelaSimbolos.at(i);
 				encontrei=true;
+				break;	
+			}
+		}
+		if(encontrei){
+			return variavel;
+		}
+		
+		for(int j=pilhaTabela.size()-1;j>=0;j--){
+			for(int i=0;i<pilhaTabela.at(j).size();i++){
+				
+				if(!pilhaTabela.at(j).at(i).temp&&(pilhaTabela.at(j).at(i).nomeOriginal.compare(nome)==0)){
 						
+					variavel=pilhaTabela.at(j).at(i);
+					encontrei=true;
+					break;		
+				}
+				
+			}
+			if(encontrei){
+				break;
 			}
 		}
 		if(!encontrei){
