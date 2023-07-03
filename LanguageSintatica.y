@@ -142,6 +142,18 @@ IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
 				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
 				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
+			| TK_IF '('LOGIC')' BLOCO_FUNCTION TK_ELSE IF{
+				ifs++;	
+				elses++;	
+				atributos elemento=verificacaoTipos($3,"!",$3);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao=$3.traducao+ "\t"+label+" = !"+$3.label+" ;\n"+
+				"\tIF("+label+") Goto ELSE"+to_string(elses)+";\n"+
+				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
+				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
+			 }
 TK_TIPO:    TK_INT{
 				$$.tipo="int";
 			}
