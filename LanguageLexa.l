@@ -23,12 +23,18 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "main"		{return TK_MAIN;}
 
+"if"        {return TK_IF;}
+"else"      {return TK_ELSE;}
+"for"       {return TK_FOR;}
+
 "int"		{return TK_INT;}
 "float"     {return TK_FLOAT;}
 "string"     {return TK_STRING;}
 "char"      {return TK_CHAR;}
 "bool"     {return TK_BOOL;}
 "var"       {return TK_VAR;}
+
+
 [(){}[\];,]	{ return *yytext; }
 (<|>)	{ return *yytext; }
 [+\-*/]		{ return *yytext; }
@@ -41,6 +47,8 @@ ID {LETRA}({LETRA}|{NUM})*
 "||"        {return TK_OU;}
 "&&"        {return TK_E;}
 "!"         {return TK_NEGACAO;}
+
+
 {INT}		{ yylval.label = yytext; return TK_NUM; }
 {REAL}      { yylval.label = yytext; return TK_REAL;}
 {CHAR}      { yylval.label = yytext; return TK_CHARACTER;}

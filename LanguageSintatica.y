@@ -9,6 +9,7 @@
 
 using namespace std;
 int registrador=0;
+int ifs=0;
 typedef struct atributos
 {
 	string label;
@@ -49,6 +50,7 @@ void yyerror(string);
 %token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE
 %token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE TK_CHAR
 %token TK_OU  TK_E  TK_NEGACAO TK_VAR
+%token TK_IF  TK_ELSE   TK_FOR
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -112,12 +114,21 @@ COMANDOS	: COMANDO COMANDOS{
 				 insereDeclaracoes(tabelaSimbolos);
 				$$.traducao=$1.traducao+$2.traducao;		
 			}
-			
 			|{
 				// cout<<1 <<endl;
 				$$.traducao="";
 			}
 			;
+IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
+				ifs++;		
+				atributos elemento=verificacaoTipos($3,"!",$3);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao=$3.traducao+ "\t"+label+" = !"+$3.label+" ;\n"+
+				"\tIF("+label+") Goto FIM_IF"+to_string(ifs)+"\n"+
+				$5.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
+			}
 TK_TIPO:    TK_INT{
 				$$.tipo="int";
 			}
@@ -150,6 +161,9 @@ COMANDO 	:
 				// tabelaSimbolos.push_back(valor);
 				$$.traducao="";
 				$$.label="";
+			}
+			|IF  {
+				$$.traducao=$1.traducao;
 			}
 			|TK_TIPO TK_ID TK_IGUAL OPERATIONS';'{
 				verificaExistencia($2.label);
