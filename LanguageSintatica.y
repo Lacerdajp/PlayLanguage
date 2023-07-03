@@ -10,6 +10,7 @@
 using namespace std;
 int registrador=0;
 int ifs=0;
+int elses=0;
 typedef struct atributos
 {
 	string label;
@@ -126,8 +127,20 @@ IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
 				 string tipo="bool";
 				insereTabela(label,tipo,true,"");
 				$$.traducao=$3.traducao+ "\t"+label+" = !"+$3.label+" ;\n"+
-				"\tIF("+label+") Goto FIM_IF"+to_string(ifs)+"\n"+
+				"\tIF("+label+") Goto FIM_IF"+to_string(ifs)+";\n"+
 				$5.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
+			}
+			| TK_IF '('LOGIC')' BLOCO_FUNCTION TK_ELSE BLOCO_FUNCTION{
+				ifs++;	
+				elses++;	
+				atributos elemento=verificacaoTipos($3,"!",$3);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao=$3.traducao+ "\t"+label+" = !"+$3.label+" ;\n"+
+				"\tIF("+label+") Goto ELSE"+to_string(elses)+";\n"+
+				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
+				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
 TK_TIPO:    TK_INT{
 				$$.tipo="int";
