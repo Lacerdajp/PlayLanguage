@@ -62,14 +62,15 @@ void yyerror(string);
 %left '*' '/'
 
 %%
-
-S 			: 
-			TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION{
-				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $5.traducao << "\treturn 0;\n}" << endl; 
-			}| INIT{
-				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
+//Tokens que só servem para ativar algo
+TOKEN_WHILE: 
+			TK_WHILE{
+				loopsAtivos++;	
 			}
-			;
+TOKEN_DO: 
+		TK_DO{
+			loopsAtivos++;	
+		}
 CHAVE_ENTRADA	: '{'{
 				
 				inserirPilha(tabelaSimbolos);
@@ -85,6 +86,16 @@ CHAVE_SAIDA	: '}'{
 				 removerPilha();
 				 
 				}
+//ramo principal
+S 			: 
+			TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION{
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $5.traducao << "\treturn 0;\n}" << endl; 
+			}| INIT{
+				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
+			}
+			;
+
+//decide se vai ter Bloco ou só comandos
 INIT: 		
 			BLOCO	{
 				$$.traducao = $1.traducao;
@@ -147,15 +158,8 @@ IF:
 				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
 				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
-TOKEN_WHILE: 
-			TK_WHILE{
-				loopsAtivos++;	
-			}
-TOKEN_DO: 
-		TK_DO{
-			loopsAtivos++;	
-		}
-WHILE: 		
+
+LOOPS: 		
 		 TOKEN_WHILE'('LOGIC')' COMANDBLOCO{	
 				loops++;
 				verificacaoTipos($3,"!",$3);
@@ -218,26 +222,73 @@ EXPRESSAO 	:
 				$$.traducao="";
 				$$.label="";
 			}
-			|TK_TIPO TK_ID TK_IGUAL OPERATIONS';'{
+			|TK_TIPO TK_ID TK_IGUAL ATRIBOPERATION{
+				
 				verificaExistencia($2.label);
 				string nomeFantasia=$2.label;
 				$2.label=GerarRegistrador();
 				insereTabela($2.label,$1.tipo,false,nomeFantasia);
 				$2.tipo=$1.tipo;
 				atributos elemento=verificacaoTipos($2,"=",$4);
-				if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				if($4.tipo=="int" && $1.tipo=="float") $4=elemento;
 				$$.traducao=elemento.traducao+"\t"+$2.label+"="+$4.label+";\n";
+				// cout<<$$.traducao<<endl;
 			}
-			|TK_ID TK_IGUAL OPERATIONS';'{
+			|ATRIBUICAO{
+				$$.traducao=$1.traducao;
+			}
+			|LOGIC';'{
+			}
+ATRIBUICAO:  	
+			TK_ID TK_IGUAL ATRIBOPERATION{
+				
 				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
 				$1.label=variavel.nomeVariavel;
 				$1.tipo=variavel.tipoVariavel;
 				atributos elemento=verificacaoTipos($1,"=",$3);
 				if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
+				 $$.label=$1.label;
+				 $$.tipo=$1.tipo;
 				$$.traducao=elemento.traducao+"\t"+$1.label+"="+$3.label+";\n";
+				// cout<<$$.label<<endl;
+				
 			}
-			|LOGIC';'{
+			|TK_ID '+'TK_IGUAL ATRIBOPERATION{
+				TIPO_SIMBOLO variavel=verificaDeclaracao($1.label);
+				$1.label=variavel.nomeVariavel;
+				$1.tipo=variavel.tipoVariavel;
+				atributos temp;
+				temp.label=GerarRegistrador();
+				temp.tipo=$1.tipo;
+				insereTabela(temp.label,temp.tipo,true,"");
+				temp.traducao="\t"+ temp.label+" = " +$1.label + ";\n";
+				atributos soma=verificacaoTipos(temp,"+",$4);
+				atributos tipo2;
+				tipo2.label=GerarRegistrador();
+				tipo2.tipo=soma.tipo;
+				insereTabela(tipo2.label,tipo2.tipo,true,"");
+				if (temp.tipo=="int"&&$4.tipo=="float") temp=soma;
+				else if($4.tipo=="int" && temp.tipo=="float") $4=soma;
+				tipo2.traducao=soma.traducao+"\t"+tipo2.label+"="+temp.label+"+"+$4.label+";\n";
+				atributos elemento=verificacaoTipos($1,"=",tipo2);
+				if(tipo2.tipo=="int" && $1.tipo=="float") tipo2=elemento;
+				 $$.label=$1.label;
+				 $$.tipo=$1.tipo;
+				$$.traducao=elemento.traducao+"\t"+$1.label+"="+tipo2.label+";\n";
+				// cout<<$$.label<<endl;
+				
+				
 			}
+ATRIBOPERATION: 	
+				ATRIBUICAO{
+						
+						$$.traducao=$1.traducao;
+						// cout<<$$.traducao<<endl;
+				}
+				| OPERATIONS';'{
+						$$.traducao=$1.traducao;
+						// cout<<$$.traducao<<endl;
+				}
 COMANDOLOOPS:  
 		TK_BREAK';'{
 			if(loopsAtivos==0){
@@ -260,7 +311,7 @@ COMANDO:
 			|IF  {
 				$$.traducao=$1.traducao;
 			}
-			|WHILE{
+			|LOOPS{
 				$$.traducao=$1.traducao;
 			}
 			| COMANDOLOOPS{
@@ -268,7 +319,8 @@ COMANDO:
 			}
 OPERATIONS: 
 			LOGIC
-			|CALC
+			|CALC{
+			}
 OPLOGIC: 
 		TK_OU{
 			$$.label="||";
@@ -428,7 +480,8 @@ CALC			:
 			}
 			|CONVERSION
 CONVERSION:    
-			ELEMENTS{}
+			ELEMENTS{
+			}
 			|'('TK_TIPO')'ELEMENTS{
 				$4.tipo=$2.tipo;
 				$$.tipo=$2.tipo;

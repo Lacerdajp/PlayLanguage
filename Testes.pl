@@ -1,5 +1,3 @@
-int a=0;
-do{ 
-     a=a+1;
-     break;
-}while(a<10);
+float i=0;
+int a=2;
+i+=a+=(int)1.0;
