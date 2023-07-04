@@ -11,8 +11,7 @@ using namespace std;
 int registrador=0;
 int ifs=0;
 int elses=0;
-typedef struct atributos
-{
+typedef struct atributos{
 	string label;
 	string traducao;
 	string tipo;
@@ -62,8 +61,8 @@ void yyerror(string);
 
 %%
 
-S 			: TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION
-			{
+S 			: 
+			TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $5.traducao << "\treturn 0;\n}" << endl; 
 			}| INIT{
 				cout << "/*Compilador Play Language*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << imprimirDeclaracaoVariavel()+ $1.traducao << "\treturn 0;\n}" << endl; 
@@ -84,23 +83,25 @@ CHAVE_SAIDA	: '}'{
 				 removerPilha();
 				 
 				}
-INIT: 		BLOCO	{
+INIT: 		
+			BLOCO	{
 				$$.traducao = $1.traducao;
 			}|
 			COMANDOS{
 				$$.traducao = $1.traducao;
 			}
-BLOCO_FUNCTION: 	CHAVE_ENTRADA INIT CHAVE_SAIDA{
+BLOCO_FUNCTION: 	
+			CHAVE_ENTRADA INIT CHAVE_SAIDA{
 				// cout<<3<<endl;
 				$$.traducao = $2.traducao;
 			}
 			
-BLOCO		:  COMANDOS BLOCO COMANDOS{
+BLOCO		:  
+			COMANDOS BLOCO COMANDOS{
 				// cout<<2<<endl;
 				$$.traducao=$1.traducao+ $2.traducao+$3.traducao;
-			}
-			|BLOCO_FUNCTION
-			{
+			}|
+			BLOCO_FUNCTION{
 				// cout<<3<<endl;
 				$$.traducao = $1.traducao;
 			}
@@ -110,7 +111,8 @@ BLOCO		:  COMANDOS BLOCO COMANDOS{
 			}
 			;
 
-COMANDOS	: COMANDO COMANDOS{
+COMANDOS	: 
+			COMANDO COMANDOS{
 				// cout<< "X :"+ pilhaTabela.size()<<endl;
 				 insereDeclaracoes(tabelaSimbolos);
 				$$.traducao=$1.traducao+$2.traducao;		
@@ -120,7 +122,8 @@ COMANDOS	: COMANDO COMANDOS{
 				$$.traducao="";
 			}
 			;
-IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
+IF:			
+			TK_IF '('LOGIC')' COMANDBLOCO{
 				ifs++;		
 				atributos elemento=verificacaoTipos($3,"!",$3);
 				 string label=GerarRegistrador();
@@ -130,7 +133,7 @@ IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
 				"\tIF("+label+") Goto FIM_IF"+to_string(ifs)+";\n"+
 				$5.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
-			| TK_IF '('LOGIC')' BLOCO_FUNCTION TK_ELSE BLOCO_FUNCTION{
+			| TK_IF '('LOGIC')' COMANDBLOCO TK_ELSE COMANDBLOCO{
 				ifs++;	
 				elses++;	
 				atributos elemento=verificacaoTipos($3,"!",$3);
@@ -142,19 +145,15 @@ IF:			TK_IF '('LOGIC')' BLOCO_FUNCTION{
 				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
 				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
-			| TK_IF '('LOGIC')' BLOCO_FUNCTION TK_ELSE IF{
-				ifs++;	
-				elses++;	
-				atributos elemento=verificacaoTipos($3,"!",$3);
-				 string label=GerarRegistrador();
-				 string tipo="bool";
-				insereTabela(label,tipo,true,"");
-				$$.traducao=$3.traducao+ "\t"+label+" = !"+$3.label+" ;\n"+
-				"\tIF("+label+") Goto ELSE"+to_string(elses)+";\n"+
-				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
-				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
-			 }
-TK_TIPO:    TK_INT{
+COMANDBLOCO :
+			BLOCO_FUNCTION{
+				$$.traducao=$1.traducao;
+			}			
+			| COMANDO{
+				$$.traducao=$1.traducao;
+			}
+TK_TIPO:    
+			TK_INT{
 				$$.tipo="int";
 			}
 			| TK_FLOAT{
@@ -209,18 +208,20 @@ COMANDO 	:
 				$$.traducao=elemento.traducao+"\t"+$1.label+"="+$3.label+";\n";
 			}
 			|LOGIC';'{
-				
 			}
 
-OPERATIONS: LOGIC
+OPERATIONS: 
+			LOGIC
 			|CALC
-OPLOGIC: TK_OU{
+OPLOGIC: 
+		TK_OU{
 			$$.label="||";
 		}
 		| TK_E{
 			$$.label="&&";
 		}
-LOGIC:		LOGIC OPLOGIC  LOGIC{
+LOGIC:		
+			LOGIC OPLOGIC  LOGIC{
 				atributos elemento=verificacaoTipos($1,$2.label,$3);
 				$$.label=GerarRegistrador();
 				$$.tipo="bool";
@@ -286,7 +287,8 @@ LOGIC:		LOGIC OPLOGIC  LOGIC{
 				$$.label=$2.label;
 				$$.traducao=$2.traducao;
 			}
-OPRELACION: '>'{
+OPRELACION: 
+			'>'{
 				$$.label=">";
 			}
 			|'<'{
@@ -309,7 +311,8 @@ OPRELACION: '>'{
 			}
 
 			
-RELACION:      CALC OPRELACION CALC{
+RELACION:      
+			CALC OPRELACION CALC{
 				
 				atributos elemento=verificacaoTipos($1,$2.label,$3);
 				$$.label=GerarRegistrador();
@@ -321,8 +324,8 @@ RELACION:      CALC OPRELACION CALC{
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
 			}
 					
-CALC			: CALC'+'CALC
-			{
+CALC			:
+			CALC'+'CALC{
 				atributos elemento=verificacaoTipos($1,"+",$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -331,10 +334,8 @@ CALC			: CALC'+'CALC
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" + "+$3.label+" ;\n";
-			}
-			
-			|CALC'*'CALC
-			{
+			}|
+			CALC'*'CALC{
 				atributos elemento=verificacaoTipos($1,"*",$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -344,8 +345,7 @@ CALC			: CALC'+'CALC
 				$$.traducao = elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" * "+$3.label+" ;\n";
 			}
-			|CALC'-'CALC
-			{   
+			|CALC'-'CALC{   
 				atributos elemento=verificacaoTipos($1,"-",$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -355,8 +355,7 @@ CALC			: CALC'+'CALC
 				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" - "+$3.label+" ;\n";
 			}
-			|CALC'/'CALC
-			{
+			|CALC'/'CALC{
 				atributos elemento=verificacaoTipos($1,"/",$3);
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
@@ -365,13 +364,15 @@ CALC			: CALC'+'CALC
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao =elemento.traducao +
 				 "\t"+$$.label+" = "+$1.label+" / "+$3.label+" ;\n";
-			}|'('CALC')'{
+			}|
+			'('CALC')'{
 				$$.tipo=$2.tipo;
 				$$.label=$2.label;
 				$$.traducao=$2.traducao;
 			}
 			|CONVERSION
-CONVERSION:    ELEMENTS{}
+CONVERSION:    
+			ELEMENTS{}
 			|'('TK_TIPO')'ELEMENTS{
 				$4.tipo=$2.tipo;
 				$$.tipo=$2.tipo;
@@ -379,15 +380,14 @@ CONVERSION:    ELEMENTS{}
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao=$4.traducao+"\t"+$$.label+"=("+$2.tipo+")"+$4.label+";\n";
 			}
-ELEMENTS:        TK_NUM
-			{
+ELEMENTS:        
+			TK_NUM{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
-			|  '-'TK_NUM
-			{
+			|  '-'TK_NUM{
 				$$.tipo="int";
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"");
@@ -439,8 +439,7 @@ ELEMENTS:        TK_NUM
 #include "lex.yy.c"
 
 int yyparse();
-int main( int argc, char* argv[] )
-{
+int main( int argc, char* argv[] ){
 	
 	yyparse();
 
@@ -622,8 +621,7 @@ void zerarTabela(){
 	}
 }
 
-void yyerror( string MSG )
-{
+void yyerror( string MSG ){
 	cout << MSG << endl;
 	exit (0);
 }				
