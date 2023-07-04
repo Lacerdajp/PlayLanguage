@@ -11,6 +11,8 @@ using namespace std;
 int registrador=0;
 int ifs=0;
 int elses=0;
+int loops=0;
+int loopsAtivos=0;
 typedef struct atributos{
 	string label;
 	string traducao;
@@ -50,7 +52,7 @@ void yyerror(string);
 %token TK_MAIOR_IGUAL TK_MENOR_IGUAL TK_IGUALDADE TK_IDENTICO TK_DIFERENTE
 %token TK_MAIN TK_ID TK_INT TK_FLOAT TK_FRASE TK_BOOL TK_TRUE TK_FALSE TK_CHAR
 %token TK_OU  TK_E  TK_NEGACAO TK_VAR
-%token TK_IF  TK_ELSE   TK_FOR
+%token TK_IF  TK_ELSE   TK_FOR TK_WHILE TK_DO TK_CONTINUE TK_BREAK
 %token TK_FIM TK_ERROR TK_IGUAL
 
 %start S
@@ -145,6 +147,36 @@ IF:
 				$5.traducao+"\tGoto FIM_IF"+to_string(ifs)+ 
 				"\n\tELSE"+to_string(elses)+":\n"+$7.traducao+"\tFIM_IF"+to_string(ifs)+":\n";
 			}
+TOKEN_WHILE: 
+			TK_WHILE{
+				loopsAtivos++;	
+			}
+TOKEN_DO: 
+		TK_DO{
+			loopsAtivos++;	
+		}
+WHILE: 		
+		 TOKEN_WHILE'('LOGIC')' COMANDBLOCO{	
+				loops++;
+				verificacaoTipos($3,"!",$3);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao= "\tINICIO_WHILE"+to_string(loops)+":\n"+$3.traducao+"\t"+label+" = !"+$3.label+" ;\n"+
+				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+
+				$5.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				loopsAtivos--;
+		}
+		| 	TOKEN_DO COMANDBLOCO	TK_WHILE'('LOGIC')'';'{	
+				loops++;
+				verificacaoTipos($5,"!",$5);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao= "\tINICIO_WHILE"+to_string(loops)+":\n"+$2.traducao+$5.traducao+"\t"+label+" = !"+$5.label+" ;\n"+
+				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				loopsAtivos--;
+		}
 COMANDBLOCO :
 			BLOCO_FUNCTION{
 				$$.traducao=$1.traducao;
@@ -171,7 +203,7 @@ TK_TIPO:
 			}|TK_VAR{
 				$$.tipo="var";
 			}
-COMANDO 	:
+EXPRESSAO 	:
 			 /* E ';' */
 			/* | */
 			 TK_TIPO TK_ID ';'{
@@ -185,9 +217,6 @@ COMANDO 	:
 				// tabelaSimbolos.push_back(valor);
 				$$.traducao="";
 				$$.label="";
-			}
-			|IF  {
-				$$.traducao=$1.traducao;
 			}
 			|TK_TIPO TK_ID TK_IGUAL OPERATIONS';'{
 				verificaExistencia($2.label);
@@ -209,7 +238,34 @@ COMANDO 	:
 			}
 			|LOGIC';'{
 			}
-
+COMANDOLOOPS:  
+		TK_BREAK';'{
+			if(loopsAtivos==0){
+				 yyerror("BREAK SEM LOOP");
+			}else{
+				$$.traducao="\t Goto FIM_WHILE"+to_string(loops+1)+";\n";
+			}
+		}
+		|TK_CONTINUE';'{
+			if(loopsAtivos==0){
+				 yyerror("CONTINUE SEM LOOP");
+			}else{
+				$$.traducao="\t Goto INICIO_WHILE"+to_string(loops+1)+";\n";
+			}
+		}
+COMANDO:	
+		EXPRESSAO{
+				$$.traducao=$1.traducao;
+			}
+			|IF  {
+				$$.traducao=$1.traducao;
+			}
+			|WHILE{
+				$$.traducao=$1.traducao;
+			}
+			| COMANDOLOOPS{
+				$$.traducao=$1.traducao;
+			}
 OPERATIONS: 
 			LOGIC
 			|CALC

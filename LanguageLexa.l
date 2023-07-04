@@ -26,6 +26,10 @@ ID {LETRA}({LETRA}|{NUM})*
 "if"        {return TK_IF;}
 "else"      {return TK_ELSE;}
 "for"       {return TK_FOR;}
+"while"     { return TK_WHILE;}
+"do"        {return TK_DO;}
+"continue"  {return TK_CONTINUE;}
+"break"     {return TK_BREAK;}
 
 "int"		{return TK_INT;}
 "float"     {return TK_FLOAT;}

@@ -1,6 +1,5 @@
-int a=2;
-int b=3;
-if(3>2) if(4==b){
-     a=6;
-}else b=7;
-b=2;
+int a=0;
+do{ 
+     a=a+1;
+     break;
+}while(a<10);
