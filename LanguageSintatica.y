@@ -87,6 +87,20 @@ CHAVE_SAIDA	: '}'{
 				 removerPilha();
 				 
 				}
+
+OPATRIBUICAO: 	
+		'+'TK_IGUAL{
+			$$.label="+=";
+		}
+		| '-'TK_IGUAL{
+			$$.label="-=";
+		}
+		| '*'TK_IGUAL{
+			$$.label="*=";
+		}
+		| '/'TK_IGUAL{
+			$$.label="/=";
+		}
 //ramo principal
 S 			: 
 			TK_TIPO TK_MAIN '(' ')'  BLOCO_FUNCTION{
@@ -240,19 +254,7 @@ EXPRESSAO 	:
 			}
 			|LOGIC';'{
 			}
-OPATRIBUICAO: 	
-		'+'TK_IGUAL{
-			$$.label="+=";
-		}
-		| '-'TK_IGUAL{
-			$$.label="-=";
-		}
-		| '*'TK_IGUAL{
-			$$.label="*=";
-		}
-		| '/'TK_IGUAL{
-			$$.label="/=";
-		}
+
 ATRIBUICAO:  	
 			TK_ID TK_IGUAL ATRIBOPERATION{
 				
@@ -270,6 +272,12 @@ ATRIBUICAO:
 			|TK_ID OPATRIBUICAO ATRIBOPERATION{
 				$$=calcAtribuicao($1,$2.label,$3);
 				// cout<<$$.label<<endl;	
+			}
+			| TK_ID '+''+'';'{
+				$$=calcAtribuicao($1,"++",$1);
+			}| 
+			TK_ID '-''-'';'{
+				$$=calcAtribuicao($1,"--",$1);
 			}
 ATRIBOPERATION: 	
 				ATRIBUICAO{
@@ -723,6 +731,7 @@ void zerarTabela(){
 	}
 }
 atributos calcAtribuicao(atributos elemen1,string operador,atributos elemen2){
+	if(operador.substr(1)=="="){
 	TIPO_SIMBOLO variavel=verificaDeclaracao(elemen1.label);
 		elemen1.label=variavel.nomeVariavel;
 		elemen1.tipo=variavel.tipoVariavel;
@@ -746,6 +755,35 @@ atributos calcAtribuicao(atributos elemen1,string operador,atributos elemen2){
 		fim.tipo=elemen1.tipo;
 		fim.traducao=elemento.traducao+"\t"+elemen1.label+"="+tipo2.label+";\n";
 			return fim;
+	}else{
+		TIPO_SIMBOLO variavel=verificaDeclaracao(elemen1.label);
+		elemen1.label=variavel.nomeVariavel;
+		elemen1.tipo=variavel.tipoVariavel;
+		atributos temp;
+		temp.label=GerarRegistrador();
+		temp.tipo=elemen1.tipo;
+		insereTabela(temp.label,temp.tipo,true,"");
+		temp.traducao="\t"+ temp.label+" = " +elemen1.label + ";\n";
+		elemen2.tipo="int";
+		elemen2.label=GerarRegistrador();
+		insereTabela(elemen2.label,elemen2.tipo,true,"");
+		elemen2.traducao ="\t"+ elemen2.label+" = 1;\n";
+		atributos soma=verificacaoTipos(temp,operador.substr(0,1),elemen2);
+		atributos tipo2;
+		tipo2.label=GerarRegistrador();
+		tipo2.tipo=soma.tipo;
+		insereTabela(tipo2.label,tipo2.tipo,true,"");
+		if (temp.tipo=="int"&&elemen2.tipo=="float") temp=soma;
+		else if(elemen2.tipo=="int" && temp.tipo=="float") elemen2=soma;
+		tipo2.traducao=soma.traducao+"\t"+tipo2.label+"="+temp.label+operador.substr(0,1)+elemen2.label+";\n";
+		atributos elemento=verificacaoTipos(elemen1,"=",tipo2);
+		if(tipo2.tipo=="int" && elemen1.tipo=="float") tipo2=elemento;
+		atributos fim;
+		fim.label=elemen1.label;
+		fim.tipo=elemen1.tipo;
+		fim.traducao=elemento.traducao+"\t"+elemen1.label+"="+tipo2.label+";\n";
+			return fim;
+	}
 }
 
 void yyerror( string MSG ){
