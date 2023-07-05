@@ -72,6 +72,11 @@ TOKEN_DO:
 		TK_DO{
 			loopsAtivos++;	
 		}
+TOKEN_FOR:  
+		TK_FOR{
+			//cout<<"test"<<endl;
+			loopsAtivos++;
+			}
 CHAVE_ENTRADA	: '{'{
 				
 				inserirPilha(tabelaSimbolos);
@@ -143,7 +148,8 @@ COMANDOS	:
 			COMANDO COMANDOS{
 				// cout<< "X :"+ pilhaTabela.size()<<endl;
 				 insereDeclaracoes(tabelaSimbolos);
-				$$.traducao=$1.traducao+$2.traducao;		
+				$$.traducao=$1.traducao+$2.traducao;	
+				
 			}
 			|{
 				// cout<<1 <<endl;
@@ -196,6 +202,16 @@ LOOPS:
 				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
 				loopsAtivos--;
 		}
+		| TOKEN_FOR '('EXPRESSAO ';' LOGIC';' EXPRESSAO')'COMANDBLOCO{
+				loops++;
+				verificacaoTipos($5,"!",$5);
+				 string label=GerarRegistrador();
+				 string tipo="bool";
+				insereTabela(label,tipo,true,"");
+				$$.traducao= $3.traducao+"\tINICIO_WHILE"+to_string(loops)+":\n"+$5.traducao+"\t"+label+" = !"+$5.label+" ;\n"+
+				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+$9.traducao+$7.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				loopsAtivos--;
+		}
 COMANDBLOCO :
 			BLOCO_FUNCTION{
 				$$.traducao=$1.traducao;
@@ -225,7 +241,7 @@ TK_TIPO:
 EXPRESSAO 	:
 			 /* E ';' */
 			/* | */
-			 TK_TIPO TK_ID ';'{
+			 TK_TIPO TK_ID {
 				verificaExistencia($2.label);
 				string nomeFantasia=$2.label;
 				$2.label=GerarRegistrador();
@@ -236,6 +252,7 @@ EXPRESSAO 	:
 				// tabelaSimbolos.push_back(valor);
 				$$.traducao="";
 				$$.label="";
+				//cout<<"teste"<<endl;
 			}
 			|TK_TIPO TK_ID TK_IGUAL ATRIBOPERATION{
 				
@@ -247,12 +264,12 @@ EXPRESSAO 	:
 				atributos elemento=verificacaoTipos($2,"=",$4);
 				if($4.tipo=="int" && $1.tipo=="float") $4=elemento;
 				$$.traducao=elemento.traducao+"\t"+$2.label+"="+$4.label+";\n";
-				// cout<<$$.traducao<<endl;
+				//cout<<$$.traducao<<endl;
 			}
 			|ATRIBUICAO{
 				$$.traducao=$1.traducao;
 			}
-			|LOGIC';'{
+			|LOGIC{
 			}
 
 ATRIBUICAO:  	
@@ -273,10 +290,11 @@ ATRIBUICAO:
 				$$=calcAtribuicao($1,$2.label,$3);
 				// cout<<$$.label<<endl;	
 			}
-			| TK_ID '+''+'';'{
+			| TK_ID '+''+'{
+				
 				$$=calcAtribuicao($1,"++",$1);
 			}| 
-			TK_ID '-''-'';'{
+			TK_ID '-''-'{
 				$$=calcAtribuicao($1,"--",$1);
 			}
 ATRIBOPERATION: 	
@@ -285,19 +303,19 @@ ATRIBOPERATION:
 						$$.traducao=$1.traducao;
 						// cout<<$$.traducao<<endl;
 				}
-				| OPERATIONS';'{
+				| OPERATIONS{
 						$$.traducao=$1.traducao;
-						// cout<<$$.traducao<<endl;
+						//cout<<$$.traducao<<endl;
 				}
 COMANDOLOOPS:  
-		TK_BREAK';'{
+		TK_BREAK{
 			if(loopsAtivos==0){
 				 yyerror("BREAK SEM LOOP");
 			}else{
 				$$.traducao="\t Goto FIM_WHILE"+to_string(loops+1)+";\n";
 			}
 		}
-		|TK_CONTINUE';'{
+		|TK_CONTINUE{
 			if(loopsAtivos==0){
 				 yyerror("CONTINUE SEM LOOP");
 			}else{
@@ -305,8 +323,9 @@ COMANDOLOOPS:
 			}
 		}
 COMANDO:	
-		EXPRESSAO{
+		EXPRESSAO';'{
 				$$.traducao=$1.traducao;
+				//cout<<$$.traducao<<endl;
 			}
 			|IF  {
 				$$.traducao=$1.traducao;
@@ -314,7 +333,7 @@ COMANDO:
 			|LOOPS{
 				$$.traducao=$1.traducao;
 			}
-			| COMANDOLOOPS{
+			| COMANDOLOOPS ';'{
 				$$.traducao=$1.traducao;
 			}
 OPERATIONS: 
@@ -430,6 +449,7 @@ RELACION:
 				else if($3.tipo=="int" && $1.tipo=="float") $3=elemento;
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
+				// cout<<$$.traducao<<endl;
 			}
 					
 CALC			:
