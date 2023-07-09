@@ -6,13 +6,14 @@
 ESPACO [ \t]
 DIGITO [0-9]
 LETRA [A-Za-z_]
+ASPAS2 \"
 
 DELIM {ESPACO}+
 NUM {DIGITO}+
 INT {NUM}
 REAL {INT}+("."{NUM}+)
 CHAR \'({LETRA}|{NUM})\'
-STRING\'(({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+)?\'
+STRING{ASPAS2}(({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+)?{ASPAS2}
 ID {LETRA}({LETRA}|{NUM})*
 
 %%
@@ -38,6 +39,8 @@ ID {LETRA}({LETRA}|{NUM})*
 "bool"     {return TK_BOOL;}
 "var"       {return TK_VAR;}
 
+"scanner"   {return TK_SCANNER;}
+"print"     {return TK_PRINT;}
 
 [(){}[\];,]	{ return *yytext; }
 (<|>)	{ return *yytext; }

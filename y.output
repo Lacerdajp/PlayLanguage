@@ -1,0 +1,2785 @@
+Terminals unused in grammar
+
+    TK_SCANNER
+    TK_PRINT
+    TK_FIM
+    TK_ERROR
+
+
+State 0 conflicts: 23 shift/reduce
+State 5 conflicts: 4 shift/reduce
+State 27 conflicts: 23 shift/reduce
+State 31 conflicts: 23 shift/reduce
+State 32 conflicts: 23 shift/reduce
+State 39 conflicts: 22 shift/reduce
+State 41 conflicts: 2 reduce/reduce
+State 68 conflicts: 23 shift/reduce, 23 reduce/reduce
+State 69 conflicts: 23 shift/reduce
+State 70 conflicts: 23 shift/reduce
+State 112 conflicts: 23 shift/reduce, 23 reduce/reduce
+State 115 conflicts: 2 shift/reduce
+State 116 conflicts: 2 shift/reduce
+State 122 conflicts: 2 shift/reduce
+State 123 conflicts: 2 shift/reduce
+State 133 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: S $end
+
+    1 TOKEN_WHILE: TK_WHILE
+
+    2 TOKEN_DO: TK_DO
+
+    3 TOKEN_FOR: TK_FOR
+
+    4 CHAVE_ENTRADA: '{'
+
+    5 CHAVE_SAIDA: '}'
+
+    6 OPATRIBUICAO: '+' TK_IGUAL
+    7             | '-' TK_IGUAL
+    8             | '*' TK_IGUAL
+    9             | '/' TK_IGUAL
+
+   10 S: TK_TIPO TK_MAIN '(' ')' BLOCO_FUNCTION
+   11  | INIT
+
+   12 INIT: BLOCO
+   13     | COMANDOS
+
+   14 BLOCO_FUNCTION: CHAVE_ENTRADA INIT CHAVE_SAIDA
+
+   15 BLOCO: COMANDOS BLOCO COMANDOS
+   16      | BLOCO_FUNCTION
+   17      | BLOCO BLOCO
+
+   18 COMANDOS: COMANDO COMANDOS
+   19         | %empty
+
+   20 IF: TK_IF '(' LOGIC ')' COMANDBLOCO
+   21   | TK_IF '(' LOGIC ')' COMANDBLOCO TK_ELSE COMANDBLOCO
+
+   22 LOOPS: TOKEN_WHILE '(' LOGIC ')' COMANDBLOCO
+   23      | TOKEN_DO COMANDBLOCO TK_WHILE '(' LOGIC ')' ';'
+   24      | TOKEN_FOR '(' EXPRESSAO ';' LOGIC ';' EXPRESSAO ')' COMANDBLOCO
+
+   25 COMANDBLOCO: BLOCO_FUNCTION
+   26            | COMANDO
+
+   27 TK_TIPO: TK_INT
+   28        | TK_FLOAT
+   29        | TK_CHAR
+   30        | TK_STRING
+   31        | TK_BOOL
+   32        | TK_VAR
+
+   33 EXPRESSAO: TK_TIPO TK_ID
+   34          | TK_TIPO TK_ID TK_IGUAL ATRIBUICAO
+   35          | ATRIBUICAO
+   36          | TK_ID OPATRIBUICAO OPERATIONS
+   37          | TK_ID '+' '+'
+   38          | TK_ID '-' '-'
+   39          | LOGIC
+
+   40 ATRIBUICAO: TK_ID TK_IGUAL ATRIBUICAO
+   41           | OPERATIONS
+
+   42 COMANDOLOOPS: TK_BREAK
+   43             | TK_CONTINUE
+
+   44 COMANDO: EXPRESSAO ';'
+   45        | IF
+   46        | LOOPS
+   47        | COMANDOLOOPS ';'
+
+   48 OPERATIONS: LOGIC
+   49           | CALC
+
+   50 OPLOGIC: TK_OU
+   51        | TK_E
+
+   52 LOGIC: LOGIC OPLOGIC LOGIC
+   53      | CALC OPLOGIC CALC
+   54      | LOGIC OPLOGIC CALC
+   55      | CALC OPLOGIC LOGIC
+   56      | TK_NEGACAO LOGIC
+   57      | TK_NEGACAO CALC
+   58      | RELACION
+   59      | '(' LOGIC ')'
+
+   60 OPRELACION: '>'
+   61           | '<'
+   62           | TK_MAIOR_IGUAL
+   63           | TK_MENOR_IGUAL
+   64           | TK_IGUALDADE
+   65           | TK_IDENTICO
+   66           | TK_DIFERENTE
+
+   67 RELACION: CALC OPRELACION CALC
+
+   68 CALC: CALC '+' CALC
+   69     | CALC '*' CALC
+   70     | CALC '-' CALC
+   71     | CALC '/' CALC
+   72     | '(' CALC ')'
+   73     | CONVERSION
+
+   74 CONVERSION: ELEMENTS
+   75           | '(' TK_TIPO ')' ELEMENTS
+
+   76 ELEMENTS: TK_NUM
+   77         | '-' TK_NUM
+   78         | TK_REAL
+   79         | TK_CHARACTER
+   80         | TK_FRASE
+   81         | TK_TRUE
+   82         | TK_FALSE
+   83         | TK_ID
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '(' (40) 10 20 21 22 23 24 59 72 75
+    ')' (41) 10 20 21 22 23 24 59 72 75
+    '*' (42) 8 69
+    '+' (43) 6 37 68
+    '-' (45) 7 38 70 77
+    '/' (47) 9 71
+    ';' (59) 23 24 44 47
+    '<' (60) 61
+    '>' (62) 60
+    '{' (123) 4
+    '}' (125) 5
+    error (256)
+    TK_NUM (258) 76 77
+    TK_REAL (259) 78
+    TK_STRING (260) 30
+    TK_CHARACTER (261) 79
+    TK_MAIOR_IGUAL (262) 62
+    TK_MENOR_IGUAL (263) 63
+    TK_IGUALDADE (264) 64
+    TK_IDENTICO (265) 65
+    TK_DIFERENTE (266) 66
+    TK_MAIN (267) 10
+    TK_ID (268) 33 34 36 37 38 40 83
+    TK_INT (269) 27
+    TK_FLOAT (270) 28
+    TK_FRASE (271) 80
+    TK_BOOL (272) 31
+    TK_TRUE (273) 81
+    TK_FALSE (274) 82
+    TK_CHAR (275) 29
+    TK_OU (276) 50
+    TK_E (277) 51
+    TK_NEGACAO (278) 56 57
+    TK_VAR (279) 32
+    TK_IF (280) 20 21
+    TK_ELSE (281) 21
+    TK_FOR (282) 3
+    TK_WHILE (283) 1 23
+    TK_DO (284) 2
+    TK_CONTINUE (285) 43
+    TK_BREAK (286) 42
+    TK_SCANNER (287)
+    TK_PRINT (288)
+    TK_FIM (289)
+    TK_ERROR (290)
+    TK_IGUAL (291) 6 7 8 9 34 40
+
+
+Nonterminals, with rules where they appear
+
+    $accept (48)
+        on left: 0
+    TOKEN_WHILE (49)
+        on left: 1
+        on right: 22
+    TOKEN_DO (50)
+        on left: 2
+        on right: 23
+    TOKEN_FOR (51)
+        on left: 3
+        on right: 24
+    CHAVE_ENTRADA (52)
+        on left: 4
+        on right: 14
+    CHAVE_SAIDA (53)
+        on left: 5
+        on right: 14
+    OPATRIBUICAO (54)
+        on left: 6 7 8 9
+        on right: 36
+    S (55)
+        on left: 10 11
+        on right: 0
+    INIT (56)
+        on left: 12 13
+        on right: 11 14
+    BLOCO_FUNCTION (57)
+        on left: 14
+        on right: 10 16 25
+    BLOCO (58)
+        on left: 15 16 17
+        on right: 12 15 17
+    COMANDOS (59)
+        on left: 18 19
+        on right: 13 15 18
+    IF (60)
+        on left: 20 21
+        on right: 45
+    LOOPS (61)
+        on left: 22 23 24
+        on right: 46
+    COMANDBLOCO (62)
+        on left: 25 26
+        on right: 20 21 22 23 24
+    TK_TIPO (63)
+        on left: 27 28 29 30 31 32
+        on right: 10 33 34 75
+    EXPRESSAO (64)
+        on left: 33 34 35 36 37 38 39
+        on right: 24 44
+    ATRIBUICAO (65)
+        on left: 40 41
+        on right: 34 35 40
+    COMANDOLOOPS (66)
+        on left: 42 43
+        on right: 47
+    COMANDO (67)
+        on left: 44 45 46 47
+        on right: 18 26
+    OPERATIONS (68)
+        on left: 48 49
+        on right: 36 41
+    OPLOGIC (69)
+        on left: 50 51
+        on right: 52 53 54 55
+    LOGIC (70)
+        on left: 52 53 54 55 56 57 58 59
+        on right: 20 21 22 23 24 39 48 52 54 55 56 59
+    OPRELACION (71)
+        on left: 60 61 62 63 64 65 66
+        on right: 67
+    RELACION (72)
+        on left: 67
+        on right: 58
+    CALC (73)
+        on left: 68 69 70 71 72 73
+        on right: 49 53 54 55 57 67 68 69 70 71 72
+    CONVERSION (74)
+        on left: 74 75
+        on right: 73
+    ELEMENTS (75)
+        on left: 76 77 78 79 80 81 82 83
+        on right: 74 75
+
+
+State 0
+
+    0 $accept: . S $end
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 19 (COMANDOS)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    S               go to state 28
+    INIT            go to state 29
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 31
+    COMANDOS        go to state 32
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 35
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 1
+
+   76 ELEMENTS: TK_NUM .
+
+    $default  reduce using rule 76 (ELEMENTS)
+
+
+State 2
+
+   78 ELEMENTS: TK_REAL .
+
+    $default  reduce using rule 78 (ELEMENTS)
+
+
+State 3
+
+   30 TK_TIPO: TK_STRING .
+
+    $default  reduce using rule 30 (TK_TIPO)
+
+
+State 4
+
+   79 ELEMENTS: TK_CHARACTER .
+
+    $default  reduce using rule 79 (ELEMENTS)
+
+
+State 5
+
+   36 EXPRESSAO: TK_ID . OPATRIBUICAO OPERATIONS
+   37          | TK_ID . '+' '+'
+   38          | TK_ID . '-' '-'
+   40 ATRIBUICAO: TK_ID . TK_IGUAL ATRIBUICAO
+   83 ELEMENTS: TK_ID .
+
+    TK_IGUAL  shift, and go to state 46
+    '+'       shift, and go to state 47
+    '-'       shift, and go to state 48
+    '*'       shift, and go to state 49
+    '/'       shift, and go to state 50
+
+    '+'       [reduce using rule 83 (ELEMENTS)]
+    '-'       [reduce using rule 83 (ELEMENTS)]
+    '*'       [reduce using rule 83 (ELEMENTS)]
+    '/'       [reduce using rule 83 (ELEMENTS)]
+    $default  reduce using rule 83 (ELEMENTS)
+
+    OPATRIBUICAO  go to state 51
+
+
+State 6
+
+   27 TK_TIPO: TK_INT .
+
+    $default  reduce using rule 27 (TK_TIPO)
+
+
+State 7
+
+   28 TK_TIPO: TK_FLOAT .
+
+    $default  reduce using rule 28 (TK_TIPO)
+
+
+State 8
+
+   80 ELEMENTS: TK_FRASE .
+
+    $default  reduce using rule 80 (ELEMENTS)
+
+
+State 9
+
+   31 TK_TIPO: TK_BOOL .
+
+    $default  reduce using rule 31 (TK_TIPO)
+
+
+State 10
+
+   81 ELEMENTS: TK_TRUE .
+
+    $default  reduce using rule 81 (ELEMENTS)
+
+
+State 11
+
+   82 ELEMENTS: TK_FALSE .
+
+    $default  reduce using rule 82 (ELEMENTS)
+
+
+State 12
+
+   29 TK_TIPO: TK_CHAR .
+
+    $default  reduce using rule 29 (TK_TIPO)
+
+
+State 13
+
+   56 LOGIC: TK_NEGACAO . LOGIC
+   57      | TK_NEGACAO . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 53
+    RELACION    go to state 42
+    CALC        go to state 54
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 14
+
+   32 TK_TIPO: TK_VAR .
+
+    $default  reduce using rule 32 (TK_TIPO)
+
+
+State 15
+
+   20 IF: TK_IF . '(' LOGIC ')' COMANDBLOCO
+   21   | TK_IF . '(' LOGIC ')' COMANDBLOCO TK_ELSE COMANDBLOCO
+
+    '('  shift, and go to state 55
+
+
+State 16
+
+    3 TOKEN_FOR: TK_FOR .
+
+    $default  reduce using rule 3 (TOKEN_FOR)
+
+
+State 17
+
+    1 TOKEN_WHILE: TK_WHILE .
+
+    $default  reduce using rule 1 (TOKEN_WHILE)
+
+
+State 18
+
+    2 TOKEN_DO: TK_DO .
+
+    $default  reduce using rule 2 (TOKEN_DO)
+
+
+State 19
+
+   43 COMANDOLOOPS: TK_CONTINUE .
+
+    $default  reduce using rule 43 (COMANDOLOOPS)
+
+
+State 20
+
+   42 COMANDOLOOPS: TK_BREAK .
+
+    $default  reduce using rule 42 (COMANDOLOOPS)
+
+
+State 21
+
+   77 ELEMENTS: '-' . TK_NUM
+
+    TK_NUM  shift, and go to state 56
+
+
+State 22
+
+    4 CHAVE_ENTRADA: '{' .
+
+    $default  reduce using rule 4 (CHAVE_ENTRADA)
+
+
+State 23
+
+   59 LOGIC: '(' . LOGIC ')'
+   72 CALC: '(' . CALC ')'
+   75 CONVERSION: '(' . TK_TIPO ')' ELEMENTS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    TK_TIPO     go to state 57
+    LOGIC       go to state 58
+    RELACION    go to state 42
+    CALC        go to state 59
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 24
+
+   22 LOOPS: TOKEN_WHILE . '(' LOGIC ')' COMANDBLOCO
+
+    '('  shift, and go to state 60
+
+
+State 25
+
+   23 LOOPS: TOKEN_DO . COMANDBLOCO TK_WHILE '(' LOGIC ')' ';'
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 61
+    IF              go to state 33
+    LOOPS           go to state 34
+    COMANDBLOCO     go to state 62
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 64
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 26
+
+   24 LOOPS: TOKEN_FOR . '(' EXPRESSAO ';' LOGIC ';' EXPRESSAO ')' COMANDBLOCO
+
+    '('  shift, and go to state 65
+
+
+State 27
+
+   14 BLOCO_FUNCTION: CHAVE_ENTRADA . INIT CHAVE_SAIDA
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 19 (COMANDOS)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    INIT            go to state 66
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 31
+    COMANDOS        go to state 32
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 28
+
+    0 $accept: S . $end
+
+    $end  shift, and go to state 67
+
+
+State 29
+
+   11 S: INIT .
+
+    $default  reduce using rule 11 (S)
+
+
+State 30
+
+   16 BLOCO: BLOCO_FUNCTION .
+
+    $default  reduce using rule 16 (BLOCO)
+
+
+State 31
+
+   12 INIT: BLOCO .
+   17 BLOCO: BLOCO . BLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 12 (INIT)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 68
+    COMANDOS        go to state 69
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 32
+
+   13 INIT: COMANDOS .
+   15 BLOCO: COMANDOS . BLOCO COMANDOS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 13 (INIT)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 70
+    COMANDOS        go to state 69
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 33
+
+   45 COMANDO: IF .
+
+    $default  reduce using rule 45 (COMANDO)
+
+
+State 34
+
+   46 COMANDO: LOOPS .
+
+    $default  reduce using rule 46 (COMANDO)
+
+
+State 35
+
+   10 S: TK_TIPO . TK_MAIN '(' ')' BLOCO_FUNCTION
+   33 EXPRESSAO: TK_TIPO . TK_ID
+   34          | TK_TIPO . TK_ID TK_IGUAL ATRIBUICAO
+
+    TK_MAIN  shift, and go to state 71
+    TK_ID    shift, and go to state 72
+
+
+State 36
+
+   44 COMANDO: EXPRESSAO . ';'
+
+    ';'  shift, and go to state 73
+
+
+State 37
+
+   35 EXPRESSAO: ATRIBUICAO .
+
+    $default  reduce using rule 35 (EXPRESSAO)
+
+
+State 38
+
+   47 COMANDO: COMANDOLOOPS . ';'
+
+    ';'  shift, and go to state 74
+
+
+State 39
+
+   18 COMANDOS: COMANDO . COMANDOS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 19 (COMANDOS)
+
+    TOKEN_WHILE   go to state 24
+    TOKEN_DO      go to state 25
+    TOKEN_FOR     go to state 26
+    COMANDOS      go to state 75
+    IF            go to state 33
+    LOOPS         go to state 34
+    TK_TIPO       go to state 63
+    EXPRESSAO     go to state 36
+    ATRIBUICAO    go to state 37
+    COMANDOLOOPS  go to state 38
+    COMANDO       go to state 39
+    OPERATIONS    go to state 40
+    LOGIC         go to state 41
+    RELACION      go to state 42
+    CALC          go to state 43
+    CONVERSION    go to state 44
+    ELEMENTS      go to state 45
+
+
+State 40
+
+   41 ATRIBUICAO: OPERATIONS .
+
+    $default  reduce using rule 41 (ATRIBUICAO)
+
+
+State 41
+
+   39 EXPRESSAO: LOGIC .
+   48 OPERATIONS: LOGIC .
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+
+    ')'       reduce using rule 39 (EXPRESSAO)
+    ')'       [reduce using rule 48 (OPERATIONS)]
+    ';'       reduce using rule 39 (EXPRESSAO)
+    ';'       [reduce using rule 48 (OPERATIONS)]
+    $default  reduce using rule 39 (EXPRESSAO)
+
+    OPLOGIC  go to state 78
+
+
+State 42
+
+   58 LOGIC: RELACION .
+
+    $default  reduce using rule 58 (LOGIC)
+
+
+State 43
+
+   49 OPERATIONS: CALC .
+   53 LOGIC: CALC . OPLOGIC CALC
+   55      | CALC . OPLOGIC LOGIC
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    TK_OU           shift, and go to state 76
+    TK_E            shift, and go to state 77
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    $default  reduce using rule 49 (OPERATIONS)
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 44
+
+   73 CALC: CONVERSION .
+
+    $default  reduce using rule 73 (CALC)
+
+
+State 45
+
+   74 CONVERSION: ELEMENTS .
+
+    $default  reduce using rule 74 (CONVERSION)
+
+
+State 46
+
+   40 ATRIBUICAO: TK_ID TK_IGUAL . ATRIBUICAO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 92
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    ATRIBUICAO  go to state 93
+    OPERATIONS  go to state 40
+    LOGIC       go to state 94
+    RELACION    go to state 42
+    CALC        go to state 43
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 47
+
+    6 OPATRIBUICAO: '+' . TK_IGUAL
+   37 EXPRESSAO: TK_ID '+' . '+'
+
+    TK_IGUAL  shift, and go to state 95
+    '+'       shift, and go to state 96
+
+
+State 48
+
+    7 OPATRIBUICAO: '-' . TK_IGUAL
+   38 EXPRESSAO: TK_ID '-' . '-'
+
+    TK_IGUAL  shift, and go to state 97
+    '-'       shift, and go to state 98
+
+
+State 49
+
+    8 OPATRIBUICAO: '*' . TK_IGUAL
+
+    TK_IGUAL  shift, and go to state 99
+
+
+State 50
+
+    9 OPATRIBUICAO: '/' . TK_IGUAL
+
+    TK_IGUAL  shift, and go to state 100
+
+
+State 51
+
+   36 EXPRESSAO: TK_ID OPATRIBUICAO . OPERATIONS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    OPERATIONS  go to state 101
+    LOGIC       go to state 94
+    RELACION    go to state 42
+    CALC        go to state 43
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 52
+
+   83 ELEMENTS: TK_ID .
+
+    $default  reduce using rule 83 (ELEMENTS)
+
+
+State 53
+
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+   56      | TK_NEGACAO LOGIC .
+
+    $default  reduce using rule 56 (LOGIC)
+
+    OPLOGIC  go to state 78
+
+
+State 54
+
+   53 LOGIC: CALC . OPLOGIC CALC
+   55      | CALC . OPLOGIC LOGIC
+   57      | TK_NEGACAO CALC .
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    $default  reduce using rule 57 (LOGIC)
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 55
+
+   20 IF: TK_IF '(' . LOGIC ')' COMANDBLOCO
+   21   | TK_IF '(' . LOGIC ')' COMANDBLOCO TK_ELSE COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 102
+    RELACION    go to state 42
+    CALC        go to state 103
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 56
+
+   77 ELEMENTS: '-' TK_NUM .
+
+    $default  reduce using rule 77 (ELEMENTS)
+
+
+State 57
+
+   75 CONVERSION: '(' TK_TIPO . ')' ELEMENTS
+
+    ')'  shift, and go to state 104
+
+
+State 58
+
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+   59      | '(' LOGIC . ')'
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+    ')'    shift, and go to state 105
+
+    OPLOGIC  go to state 78
+
+
+State 59
+
+   53 LOGIC: CALC . OPLOGIC CALC
+   55      | CALC . OPLOGIC LOGIC
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+   72     | '(' CALC . ')'
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    TK_OU           shift, and go to state 76
+    TK_E            shift, and go to state 77
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    ')'             shift, and go to state 106
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 60
+
+   22 LOOPS: TOKEN_WHILE '(' . LOGIC ')' COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 107
+    RELACION    go to state 42
+    CALC        go to state 103
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 61
+
+   25 COMANDBLOCO: BLOCO_FUNCTION .
+
+    $default  reduce using rule 25 (COMANDBLOCO)
+
+
+State 62
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO . TK_WHILE '(' LOGIC ')' ';'
+
+    TK_WHILE  shift, and go to state 108
+
+
+State 63
+
+   33 EXPRESSAO: TK_TIPO . TK_ID
+   34          | TK_TIPO . TK_ID TK_IGUAL ATRIBUICAO
+
+    TK_ID  shift, and go to state 72
+
+
+State 64
+
+   26 COMANDBLOCO: COMANDO .
+
+    $default  reduce using rule 26 (COMANDBLOCO)
+
+
+State 65
+
+   24 LOOPS: TOKEN_FOR '(' . EXPRESSAO ';' LOGIC ';' EXPRESSAO ')' COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    TK_TIPO     go to state 63
+    EXPRESSAO   go to state 109
+    ATRIBUICAO  go to state 37
+    OPERATIONS  go to state 40
+    LOGIC       go to state 41
+    RELACION    go to state 42
+    CALC        go to state 43
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 66
+
+   14 BLOCO_FUNCTION: CHAVE_ENTRADA INIT . CHAVE_SAIDA
+
+    '}'  shift, and go to state 110
+
+    CHAVE_SAIDA  go to state 111
+
+
+State 67
+
+    0 $accept: S $end .
+
+    $default  accept
+
+
+State 68
+
+   17 BLOCO: BLOCO . BLOCO
+   17      | BLOCO BLOCO .
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 17 (BLOCO)]
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 17 (BLOCO)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 17 (BLOCO)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 17 (BLOCO)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 17 (BLOCO)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 17 (BLOCO)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 17 (BLOCO)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 17 (BLOCO)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 17 (BLOCO)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 17 (BLOCO)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 17 (BLOCO)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 17 (BLOCO)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 17 (BLOCO)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 17 (BLOCO)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 17 (BLOCO)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 17 (BLOCO)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 17 (BLOCO)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 17 (BLOCO)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 17 (BLOCO)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 17 (BLOCO)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 17 (BLOCO)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 17 (BLOCO)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 17 (BLOCO)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 17 (BLOCO)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 68
+    COMANDOS        go to state 69
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 69
+
+   15 BLOCO: COMANDOS . BLOCO COMANDOS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 70
+    COMANDOS        go to state 69
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 70
+
+   15 BLOCO: COMANDOS BLOCO . COMANDOS
+   17      | BLOCO . BLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 19 (COMANDOS)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 68
+    COMANDOS        go to state 112
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 71
+
+   10 S: TK_TIPO TK_MAIN . '(' ')' BLOCO_FUNCTION
+
+    '('  shift, and go to state 113
+
+
+State 72
+
+   33 EXPRESSAO: TK_TIPO TK_ID .
+   34          | TK_TIPO TK_ID . TK_IGUAL ATRIBUICAO
+
+    TK_IGUAL  shift, and go to state 114
+
+    $default  reduce using rule 33 (EXPRESSAO)
+
+
+State 73
+
+   44 COMANDO: EXPRESSAO ';' .
+
+    $default  reduce using rule 44 (COMANDO)
+
+
+State 74
+
+   47 COMANDO: COMANDOLOOPS ';' .
+
+    $default  reduce using rule 47 (COMANDO)
+
+
+State 75
+
+   18 COMANDOS: COMANDO COMANDOS .
+
+    $default  reduce using rule 18 (COMANDOS)
+
+
+State 76
+
+   50 OPLOGIC: TK_OU .
+
+    $default  reduce using rule 50 (OPLOGIC)
+
+
+State 77
+
+   51 OPLOGIC: TK_E .
+
+    $default  reduce using rule 51 (OPLOGIC)
+
+
+State 78
+
+   52 LOGIC: LOGIC OPLOGIC . LOGIC
+   54      | LOGIC OPLOGIC . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 115
+    RELACION    go to state 42
+    CALC        go to state 116
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 79
+
+   62 OPRELACION: TK_MAIOR_IGUAL .
+
+    $default  reduce using rule 62 (OPRELACION)
+
+
+State 80
+
+   63 OPRELACION: TK_MENOR_IGUAL .
+
+    $default  reduce using rule 63 (OPRELACION)
+
+
+State 81
+
+   64 OPRELACION: TK_IGUALDADE .
+
+    $default  reduce using rule 64 (OPRELACION)
+
+
+State 82
+
+   65 OPRELACION: TK_IDENTICO .
+
+    $default  reduce using rule 65 (OPRELACION)
+
+
+State 83
+
+   66 OPRELACION: TK_DIFERENTE .
+
+    $default  reduce using rule 66 (OPRELACION)
+
+
+State 84
+
+   68 CALC: CALC '+' . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    CALC        go to state 118
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 85
+
+   70 CALC: CALC '-' . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    CALC        go to state 119
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 86
+
+   69 CALC: CALC '*' . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    CALC        go to state 120
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 87
+
+   71 CALC: CALC '/' . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    CALC        go to state 121
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 88
+
+   60 OPRELACION: '>' .
+
+    $default  reduce using rule 60 (OPRELACION)
+
+
+State 89
+
+   61 OPRELACION: '<' .
+
+    $default  reduce using rule 61 (OPRELACION)
+
+
+State 90
+
+   53 LOGIC: CALC OPLOGIC . CALC
+   55      | CALC OPLOGIC . LOGIC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 122
+    RELACION    go to state 42
+    CALC        go to state 123
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 91
+
+   67 RELACION: CALC OPRELACION . CALC
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    CALC        go to state 124
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 92
+
+   40 ATRIBUICAO: TK_ID . TK_IGUAL ATRIBUICAO
+   83 ELEMENTS: TK_ID .
+
+    TK_IGUAL  shift, and go to state 46
+
+    $default  reduce using rule 83 (ELEMENTS)
+
+
+State 93
+
+   40 ATRIBUICAO: TK_ID TK_IGUAL ATRIBUICAO .
+
+    $default  reduce using rule 40 (ATRIBUICAO)
+
+
+State 94
+
+   48 OPERATIONS: LOGIC .
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+
+    $default  reduce using rule 48 (OPERATIONS)
+
+    OPLOGIC  go to state 78
+
+
+State 95
+
+    6 OPATRIBUICAO: '+' TK_IGUAL .
+
+    $default  reduce using rule 6 (OPATRIBUICAO)
+
+
+State 96
+
+   37 EXPRESSAO: TK_ID '+' '+' .
+
+    $default  reduce using rule 37 (EXPRESSAO)
+
+
+State 97
+
+    7 OPATRIBUICAO: '-' TK_IGUAL .
+
+    $default  reduce using rule 7 (OPATRIBUICAO)
+
+
+State 98
+
+   38 EXPRESSAO: TK_ID '-' '-' .
+
+    $default  reduce using rule 38 (EXPRESSAO)
+
+
+State 99
+
+    8 OPATRIBUICAO: '*' TK_IGUAL .
+
+    $default  reduce using rule 8 (OPATRIBUICAO)
+
+
+State 100
+
+    9 OPATRIBUICAO: '/' TK_IGUAL .
+
+    $default  reduce using rule 9 (OPATRIBUICAO)
+
+
+State 101
+
+   36 EXPRESSAO: TK_ID OPATRIBUICAO OPERATIONS .
+
+    $default  reduce using rule 36 (EXPRESSAO)
+
+
+State 102
+
+   20 IF: TK_IF '(' LOGIC . ')' COMANDBLOCO
+   21   | TK_IF '(' LOGIC . ')' COMANDBLOCO TK_ELSE COMANDBLOCO
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+    ')'    shift, and go to state 125
+
+    OPLOGIC  go to state 78
+
+
+State 103
+
+   53 LOGIC: CALC . OPLOGIC CALC
+   55      | CALC . OPLOGIC LOGIC
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    TK_OU           shift, and go to state 76
+    TK_E            shift, and go to state 77
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 104
+
+   75 CONVERSION: '(' TK_TIPO ')' . ELEMENTS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    '-'           shift, and go to state 21
+
+    ELEMENTS  go to state 126
+
+
+State 105
+
+   59 LOGIC: '(' LOGIC ')' .
+
+    $default  reduce using rule 59 (LOGIC)
+
+
+State 106
+
+   72 CALC: '(' CALC ')' .
+
+    $default  reduce using rule 72 (CALC)
+
+
+State 107
+
+   22 LOOPS: TOKEN_WHILE '(' LOGIC . ')' COMANDBLOCO
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+    ')'    shift, and go to state 127
+
+    OPLOGIC  go to state 78
+
+
+State 108
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO TK_WHILE . '(' LOGIC ')' ';'
+
+    '('  shift, and go to state 128
+
+
+State 109
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO . ';' LOGIC ';' EXPRESSAO ')' COMANDBLOCO
+
+    ';'  shift, and go to state 129
+
+
+State 110
+
+    5 CHAVE_SAIDA: '}' .
+
+    $default  reduce using rule 5 (CHAVE_SAIDA)
+
+
+State 111
+
+   14 BLOCO_FUNCTION: CHAVE_ENTRADA INIT CHAVE_SAIDA .
+
+    $default  reduce using rule 14 (BLOCO_FUNCTION)
+
+
+State 112
+
+   15 BLOCO: COMANDOS . BLOCO COMANDOS
+   15      | COMANDOS BLOCO COMANDOS .
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TK_NUM        [reduce using rule 15 (BLOCO)]
+    TK_NUM        [reduce using rule 19 (COMANDOS)]
+    TK_REAL       [reduce using rule 15 (BLOCO)]
+    TK_REAL       [reduce using rule 19 (COMANDOS)]
+    TK_STRING     [reduce using rule 15 (BLOCO)]
+    TK_STRING     [reduce using rule 19 (COMANDOS)]
+    TK_CHARACTER  [reduce using rule 15 (BLOCO)]
+    TK_CHARACTER  [reduce using rule 19 (COMANDOS)]
+    TK_ID         [reduce using rule 15 (BLOCO)]
+    TK_ID         [reduce using rule 19 (COMANDOS)]
+    TK_INT        [reduce using rule 15 (BLOCO)]
+    TK_INT        [reduce using rule 19 (COMANDOS)]
+    TK_FLOAT      [reduce using rule 15 (BLOCO)]
+    TK_FLOAT      [reduce using rule 19 (COMANDOS)]
+    TK_FRASE      [reduce using rule 15 (BLOCO)]
+    TK_FRASE      [reduce using rule 19 (COMANDOS)]
+    TK_BOOL       [reduce using rule 15 (BLOCO)]
+    TK_BOOL       [reduce using rule 19 (COMANDOS)]
+    TK_TRUE       [reduce using rule 15 (BLOCO)]
+    TK_TRUE       [reduce using rule 19 (COMANDOS)]
+    TK_FALSE      [reduce using rule 15 (BLOCO)]
+    TK_FALSE      [reduce using rule 19 (COMANDOS)]
+    TK_CHAR       [reduce using rule 15 (BLOCO)]
+    TK_CHAR       [reduce using rule 19 (COMANDOS)]
+    TK_NEGACAO    [reduce using rule 15 (BLOCO)]
+    TK_NEGACAO    [reduce using rule 19 (COMANDOS)]
+    TK_VAR        [reduce using rule 15 (BLOCO)]
+    TK_VAR        [reduce using rule 19 (COMANDOS)]
+    TK_IF         [reduce using rule 15 (BLOCO)]
+    TK_IF         [reduce using rule 19 (COMANDOS)]
+    TK_FOR        [reduce using rule 15 (BLOCO)]
+    TK_FOR        [reduce using rule 19 (COMANDOS)]
+    TK_WHILE      [reduce using rule 15 (BLOCO)]
+    TK_WHILE      [reduce using rule 19 (COMANDOS)]
+    TK_DO         [reduce using rule 15 (BLOCO)]
+    TK_DO         [reduce using rule 19 (COMANDOS)]
+    TK_CONTINUE   [reduce using rule 15 (BLOCO)]
+    TK_CONTINUE   [reduce using rule 19 (COMANDOS)]
+    TK_BREAK      [reduce using rule 15 (BLOCO)]
+    TK_BREAK      [reduce using rule 19 (COMANDOS)]
+    '-'           [reduce using rule 15 (BLOCO)]
+    '-'           [reduce using rule 19 (COMANDOS)]
+    '{'           [reduce using rule 15 (BLOCO)]
+    '{'           [reduce using rule 19 (COMANDOS)]
+    '('           [reduce using rule 15 (BLOCO)]
+    '('           [reduce using rule 19 (COMANDOS)]
+    $default      reduce using rule 15 (BLOCO)
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 30
+    BLOCO           go to state 70
+    COMANDOS        go to state 69
+    IF              go to state 33
+    LOOPS           go to state 34
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 39
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 113
+
+   10 S: TK_TIPO TK_MAIN '(' . ')' BLOCO_FUNCTION
+
+    ')'  shift, and go to state 130
+
+
+State 114
+
+   34 EXPRESSAO: TK_TIPO TK_ID TK_IGUAL . ATRIBUICAO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 92
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    ATRIBUICAO  go to state 131
+    OPERATIONS  go to state 40
+    LOGIC       go to state 94
+    RELACION    go to state 42
+    CALC        go to state 43
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 115
+
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   52      | LOGIC OPLOGIC LOGIC .
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+
+    TK_OU     [reduce using rule 52 (LOGIC)]
+    TK_E      [reduce using rule 52 (LOGIC)]
+    $default  reduce using rule 52 (LOGIC)
+
+    OPLOGIC  go to state 78
+
+
+State 116
+
+   53 LOGIC: CALC . OPLOGIC CALC
+   54      | LOGIC OPLOGIC CALC .
+   55      | CALC . OPLOGIC LOGIC
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    TK_OU           shift, and go to state 76
+    TK_E            shift, and go to state 77
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    TK_OU     [reduce using rule 54 (LOGIC)]
+    TK_E      [reduce using rule 54 (LOGIC)]
+    $default  reduce using rule 54 (LOGIC)
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 117
+
+   72 CALC: '(' . CALC ')'
+   75 CONVERSION: '(' . TK_TIPO ')' ELEMENTS
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_VAR        shift, and go to state 14
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 117
+
+    TK_TIPO     go to state 57
+    CALC        go to state 132
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 118
+
+   68 CALC: CALC . '+' CALC
+   68     | CALC '+' CALC .
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    '*'  shift, and go to state 86
+    '/'  shift, and go to state 87
+
+    $default  reduce using rule 68 (CALC)
+
+
+State 119
+
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   70     | CALC '-' CALC .
+   71     | CALC . '/' CALC
+
+    '*'  shift, and go to state 86
+    '/'  shift, and go to state 87
+
+    $default  reduce using rule 70 (CALC)
+
+
+State 120
+
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   69     | CALC '*' CALC .
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    $default  reduce using rule 69 (CALC)
+
+
+State 121
+
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+   71     | CALC '/' CALC .
+
+    $default  reduce using rule 71 (CALC)
+
+
+State 122
+
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+   55      | CALC OPLOGIC LOGIC .
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+
+    TK_OU     [reduce using rule 55 (LOGIC)]
+    TK_E      [reduce using rule 55 (LOGIC)]
+    $default  reduce using rule 55 (LOGIC)
+
+    OPLOGIC  go to state 78
+
+
+State 123
+
+   53 LOGIC: CALC . OPLOGIC CALC
+   53      | CALC OPLOGIC CALC .
+   55      | CALC . OPLOGIC LOGIC
+   67 RELACION: CALC . OPRELACION CALC
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    TK_MAIOR_IGUAL  shift, and go to state 79
+    TK_MENOR_IGUAL  shift, and go to state 80
+    TK_IGUALDADE    shift, and go to state 81
+    TK_IDENTICO     shift, and go to state 82
+    TK_DIFERENTE    shift, and go to state 83
+    TK_OU           shift, and go to state 76
+    TK_E            shift, and go to state 77
+    '+'             shift, and go to state 84
+    '-'             shift, and go to state 85
+    '*'             shift, and go to state 86
+    '/'             shift, and go to state 87
+    '>'             shift, and go to state 88
+    '<'             shift, and go to state 89
+
+    TK_OU     [reduce using rule 53 (LOGIC)]
+    TK_E      [reduce using rule 53 (LOGIC)]
+    $default  reduce using rule 53 (LOGIC)
+
+    OPLOGIC     go to state 90
+    OPRELACION  go to state 91
+
+
+State 124
+
+   67 RELACION: CALC OPRELACION CALC .
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+
+    '+'  shift, and go to state 84
+    '-'  shift, and go to state 85
+    '*'  shift, and go to state 86
+    '/'  shift, and go to state 87
+
+    $default  reduce using rule 67 (RELACION)
+
+
+State 125
+
+   20 IF: TK_IF '(' LOGIC ')' . COMANDBLOCO
+   21   | TK_IF '(' LOGIC ')' . COMANDBLOCO TK_ELSE COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 61
+    IF              go to state 33
+    LOOPS           go to state 34
+    COMANDBLOCO     go to state 133
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 64
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 126
+
+   75 CONVERSION: '(' TK_TIPO ')' ELEMENTS .
+
+    $default  reduce using rule 75 (CONVERSION)
+
+
+State 127
+
+   22 LOOPS: TOKEN_WHILE '(' LOGIC ')' . COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 61
+    IF              go to state 33
+    LOOPS           go to state 34
+    COMANDBLOCO     go to state 134
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 64
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 128
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO TK_WHILE '(' . LOGIC ')' ';'
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 135
+    RELACION    go to state 42
+    CALC        go to state 103
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 129
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' . LOGIC ';' EXPRESSAO ')' COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 52
+    TK_FRASE      shift, and go to state 8
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_NEGACAO    shift, and go to state 13
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    LOGIC       go to state 136
+    RELACION    go to state 42
+    CALC        go to state 103
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 130
+
+   10 S: TK_TIPO TK_MAIN '(' ')' . BLOCO_FUNCTION
+
+    '{'  shift, and go to state 22
+
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 137
+
+
+State 131
+
+   34 EXPRESSAO: TK_TIPO TK_ID TK_IGUAL ATRIBUICAO .
+
+    $default  reduce using rule 34 (EXPRESSAO)
+
+
+State 132
+
+   68 CALC: CALC . '+' CALC
+   69     | CALC . '*' CALC
+   70     | CALC . '-' CALC
+   71     | CALC . '/' CALC
+   72     | '(' CALC . ')'
+
+    '+'  shift, and go to state 84
+    '-'  shift, and go to state 85
+    '*'  shift, and go to state 86
+    '/'  shift, and go to state 87
+    ')'  shift, and go to state 106
+
+
+State 133
+
+   20 IF: TK_IF '(' LOGIC ')' COMANDBLOCO .
+   21   | TK_IF '(' LOGIC ')' COMANDBLOCO . TK_ELSE COMANDBLOCO
+
+    TK_ELSE  shift, and go to state 138
+
+    TK_ELSE   [reduce using rule 20 (IF)]
+    $default  reduce using rule 20 (IF)
+
+
+State 134
+
+   22 LOOPS: TOKEN_WHILE '(' LOGIC ')' COMANDBLOCO .
+
+    $default  reduce using rule 22 (LOOPS)
+
+
+State 135
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO TK_WHILE '(' LOGIC . ')' ';'
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+    ')'    shift, and go to state 139
+
+    OPLOGIC  go to state 78
+
+
+State 136
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' LOGIC . ';' EXPRESSAO ')' COMANDBLOCO
+   52 LOGIC: LOGIC . OPLOGIC LOGIC
+   54      | LOGIC . OPLOGIC CALC
+
+    TK_OU  shift, and go to state 76
+    TK_E   shift, and go to state 77
+    ';'    shift, and go to state 140
+
+    OPLOGIC  go to state 78
+
+
+State 137
+
+   10 S: TK_TIPO TK_MAIN '(' ')' BLOCO_FUNCTION .
+
+    $default  reduce using rule 10 (S)
+
+
+State 138
+
+   21 IF: TK_IF '(' LOGIC ')' COMANDBLOCO TK_ELSE . COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 61
+    IF              go to state 33
+    LOOPS           go to state 34
+    COMANDBLOCO     go to state 141
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 64
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 139
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO TK_WHILE '(' LOGIC ')' . ';'
+
+    ';'  shift, and go to state 142
+
+
+State 140
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' LOGIC ';' . EXPRESSAO ')' COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    '-'           shift, and go to state 21
+    '('           shift, and go to state 23
+
+    TK_TIPO     go to state 63
+    EXPRESSAO   go to state 143
+    ATRIBUICAO  go to state 37
+    OPERATIONS  go to state 40
+    LOGIC       go to state 41
+    RELACION    go to state 42
+    CALC        go to state 43
+    CONVERSION  go to state 44
+    ELEMENTS    go to state 45
+
+
+State 141
+
+   21 IF: TK_IF '(' LOGIC ')' COMANDBLOCO TK_ELSE COMANDBLOCO .
+
+    $default  reduce using rule 21 (IF)
+
+
+State 142
+
+   23 LOOPS: TOKEN_DO COMANDBLOCO TK_WHILE '(' LOGIC ')' ';' .
+
+    $default  reduce using rule 23 (LOOPS)
+
+
+State 143
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' LOGIC ';' EXPRESSAO . ')' COMANDBLOCO
+
+    ')'  shift, and go to state 144
+
+
+State 144
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' LOGIC ';' EXPRESSAO ')' . COMANDBLOCO
+
+    TK_NUM        shift, and go to state 1
+    TK_REAL       shift, and go to state 2
+    TK_STRING     shift, and go to state 3
+    TK_CHARACTER  shift, and go to state 4
+    TK_ID         shift, and go to state 5
+    TK_INT        shift, and go to state 6
+    TK_FLOAT      shift, and go to state 7
+    TK_FRASE      shift, and go to state 8
+    TK_BOOL       shift, and go to state 9
+    TK_TRUE       shift, and go to state 10
+    TK_FALSE      shift, and go to state 11
+    TK_CHAR       shift, and go to state 12
+    TK_NEGACAO    shift, and go to state 13
+    TK_VAR        shift, and go to state 14
+    TK_IF         shift, and go to state 15
+    TK_FOR        shift, and go to state 16
+    TK_WHILE      shift, and go to state 17
+    TK_DO         shift, and go to state 18
+    TK_CONTINUE   shift, and go to state 19
+    TK_BREAK      shift, and go to state 20
+    '-'           shift, and go to state 21
+    '{'           shift, and go to state 22
+    '('           shift, and go to state 23
+
+    TOKEN_WHILE     go to state 24
+    TOKEN_DO        go to state 25
+    TOKEN_FOR       go to state 26
+    CHAVE_ENTRADA   go to state 27
+    BLOCO_FUNCTION  go to state 61
+    IF              go to state 33
+    LOOPS           go to state 34
+    COMANDBLOCO     go to state 145
+    TK_TIPO         go to state 63
+    EXPRESSAO       go to state 36
+    ATRIBUICAO      go to state 37
+    COMANDOLOOPS    go to state 38
+    COMANDO         go to state 64
+    OPERATIONS      go to state 40
+    LOGIC           go to state 41
+    RELACION        go to state 42
+    CALC            go to state 43
+    CONVERSION      go to state 44
+    ELEMENTS        go to state 45
+
+
+State 145
+
+   24 LOOPS: TOKEN_FOR '(' EXPRESSAO ';' LOGIC ';' EXPRESSAO ')' COMANDBLOCO .
+
+    $default  reduce using rule 24 (LOOPS)
