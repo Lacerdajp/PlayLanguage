@@ -13,7 +13,7 @@ NUM {DIGITO}+
 INT {NUM}
 REAL {INT}+("."{NUM}+)
 CHAR \'({LETRA}|{NUM})\'
-STRING{ASPAS2}(({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?])+)?{ASPAS2}
+STRING{ASPAS2}(({LETRA}|{NUM}|{ESPACO}|[(){}[\];,]|[+\-*/=%$#@!&¨*<>,.;|^~`´?]|[éÉçÇãÃáÁÀàÊêõÕôôÔÓóÒòÚú])+)?{ASPAS2}
 ID {LETRA}({LETRA}|{NUM})*
 
 %%

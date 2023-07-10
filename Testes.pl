@@ -1,3 +1,2 @@
-string a;
-a="amor";
-a="paz"+a;
+print("Amor"+"vida");
+

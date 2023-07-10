@@ -1,5 +1,6 @@
 //IMPLEMENTE O TIPO BOOL
 /* ajustes: atribuir i++ ex: a=i++
+concatenar outros tipos alem de string;
 adicionar \n e \t a linguagem;
 cin e cout */
 %{
@@ -358,38 +359,19 @@ COMANDO:
 			| COMANDOLOOPS ';'{
 				$$.traducao=$1.traducao;
 			}
-			/* |TK_SCANNER'('TK_ID')'';'{
-				TIPO_SIMBOLO variavel=verificaDeclaracao($3.label);
-				$3.label=variavel.nomeVariavel;
-				$3.tipo=variavel.tipoVariavel;
-				$1.label=GerarRegistrador();
-				$1.tipo="string";
-				insereTabela($1.label,$1.tipo,true,"");
-				$1.traducao="\tcin>>"+$1.label+";\n";
-				if($3.tipo!="string"){
-					atributos passagem;
-					passagem.label=GerarRegistrador();
-					passagem.tipo=$3.tipo;
-					insereTabela(passagem.label,passagem.tipo,true,"");
-					passagem.traducao=$1.traducao+"\t"+passagem.label+"= ("+passagem.tipo+")"+$1.label+";\n";
-					$1=passagem;
-				}
-				 $$.label=$3.label;
-				 $$.tipo=$3.tipo;
-				$$.traducao=$1.traducao+"\t"+$3.label+"="+$1.label+";\n";
-				// cout<<$$.label<<endl;
+			|TK_SCANNER'('TK_ID')'';'{
+				TIPO_SIMBOLO var=verificaDeclaracao($3.label);
+				$$.traducao="\tcin>>"+var.nomeVariavel+";\n";
 			}
-			|TK_PRINT'('OPOP')'';'{
-
+			|TK_PRINT'('OPERATIONS')'';'{
+				$$.traducao=$3.traducao+"\tcout<<"+$3.label+"<<endl;\n";
 			}
-OPOP:	
+/* OPOP:	
 		OPERATIONS','OPOP{
 			
 		}
 		|OPERATIONS{
-			if($1.tipo!= string){
-
-			}
+			
 		} */
 OPERATIONS: 
 			LOGIC{
@@ -571,11 +553,15 @@ CONVERSION:
 			ELEMENTS{
 			}
 			|'('TK_TIPO')'ELEMENTS{
+				if($2.tipo!="string"){
 				$4.tipo=$2.tipo;
 				$$.tipo=$2.tipo;
 				$$.label=GerarRegistrador();
 				insereTabela($$.label,$$.tipo,true,"",0);
 				$$.traducao=$4.traducao+"\t"+$$.label+"=("+$2.tipo+")"+$4.label+";\n";
+				}else{
+					yyerror("nao converte");
+				}
 			}
 ELEMENTS:        
 			TK_NUM{
