@@ -346,7 +346,7 @@ COMANDOLOOPS:
 			}
 		}
 COMANDO:	
-		EXPRESSAO';'{
+			EXPRESSAO';'{
 				$$.traducao=$1.traducao;
 				//cout<<$$.traducao<<endl;
 			}
@@ -361,7 +361,12 @@ COMANDO:
 			}
 			|TK_SCANNER'('TK_ID')'';'{
 				TIPO_SIMBOLO var=verificaDeclaracao($3.label);
-				$$.traducao="\tcin>>"+var.nomeVariavel+";\n";
+				if(var.tam==0){
+					$$.traducao="\tcin>>"+var.nomeVariavel+";\n";
+				}else{
+					$$.traducao="\tfree("+var.nomeVariavel+")\n\tcin>>"+var.nomeVariavel+";\n";
+				}
+				
 			}
 			|TK_PRINT'('OPERATIONS')'';'{
 				$$.traducao=$3.traducao+"\tcout<<"+$3.label+"<<endl;\n";
@@ -490,6 +495,10 @@ RELACION:
 				$$.traducao = elemento.traducao+
 				 "\t"+$$.label+" = "+$1.label+" "+$2.label+" "+$3.label+" ;\n";
 				// cout<<$$.traducao<<endl;
+			}
+			|CALC{
+				if($1.tipo!="bool") yyerror("Não é um valor Boleano");
+				$$.traducao=$1.traducao;
 			}
 					
 CALC	:
