@@ -1,4 +1,7 @@
 int main() {
-      string a;
-      a='j';
+    string a;
+    string b;
+    scanner(a);
+    b=a+"amor";
+
  }

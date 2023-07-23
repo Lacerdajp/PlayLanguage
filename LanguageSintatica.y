@@ -198,7 +198,7 @@ LOOPS:
 				insereTabela(label,tipo,true,"","0");
 				$$.traducao= "\tINICIO_WHILE"+to_string(loops)+":\n"+$3.traducao+"\t"+label+" = !"+$3.label+" ;\n"+
 				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+
-				$5.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				$5.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+";\n\tFIM_WHILE"+to_string(loops)+":\n";
 				loopsAtivos--;
 		}
 		| 	TOKEN_DO COMANDBLOCO	TK_WHILE'('LOGIC')'';'{	
@@ -208,7 +208,7 @@ LOOPS:
 				 string tipo="bool";
 				insereTabela(label,tipo,true,"","0");
 				$$.traducao= "\tINICIO_WHILE"+to_string(loops)+":\n"+$2.traducao+$5.traducao+"\t"+label+" = !"+$5.label+" ;\n"+
-				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+"\tGoto INICIO_WHILE"+to_string(loops)+";\n\tFIM_WHILE"+to_string(loops)+":\n";
 				loopsAtivos--;
 		}
 		| TOKEN_FOR '('EXPRESSAO ';' LOGIC';' EXPRESSAO')'COMANDBLOCO{
@@ -218,7 +218,7 @@ LOOPS:
 				 string tipo="bool";
 				insereTabela(label,tipo,true,"","0");
 				$$.traducao= $3.traducao+"\tINICIO_WHILE"+to_string(loops)+":\n"+$5.traducao+"\t"+label+" = !"+$5.label+" ;\n"+
-				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+$9.traducao+$7.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
+				"\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+$9.traducao+$7.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+";\n\tFIM_WHILE"+to_string(loops)+":\n";
 				loopsAtivos--;
 		}
 COMANDBLOCO :
@@ -365,21 +365,42 @@ COMANDO:
 			}
 			|TK_SCANNER'('TK_ID')'';'{
 				TIPO_SIMBOLO var=verificaDeclaracao($3.label);
-				if($3.tipo=="string"&&var.tam.compare("0")!=0){
+				$$.label=var.nomeVariavel;
+				$$.tipo=var.nomeVariavel;
+				if(var.tipoVariavel.compare("string")==0&&var.tam.compare("0")!=0){
 					$$.traducao="\tfree("+var.nomeVariavel+")\n\tcin>>"+var.nomeVariavel+";\n";
 				}else{
 					$$.traducao="\tcin>>"+var.nomeVariavel+";\n";
 				}
-				// if($3.tipo=="string"){
-				//  loops++;
-				//  string cout=GerarRegistrador();
-				//  string var=GerarRegistrador();
-				//  insereTabela(cout,"int",true,"","0");
-				//  insereTabela(var,"char",true,"","1");
-				//  $$.traducao= $$.traducao+"\t\tINICIO_WHILE"+to_string(loops)+":\n"+$3.traducao+"\t"+label+" = !"+$3.label+" ;\n"+
-				//  "\tIF("+label+") Goto FIM_WHILE"+to_string(loops)+";\n"+
-				//  $5.traducao+"\tGoto INICIO_WHILE"+to_string(loops)+"\n\tFIM_WHILE"+to_string(loops)+":\n";
-				// }				
+				if(var.tipoVariavel.compare("string")==0){
+				  loops++;
+				  string cout=GerarRegistrador();
+				  string temp=GerarRegistrador();
+				  string varChar=GerarRegistrador();
+				  string e1Rel=GerarRegistrador();
+				  string e2Rel=GerarRegistrador();
+				  string relacao=GerarRegistrador();
+				  string relacaoNeg=GerarRegistrador();
+				
+				  insereTabela(cout,"int",true,"","0");
+				  insereTabela(temp,"int",true,"","0");
+				  insereTabela(varChar,"char",true,"","1");
+				  insereTabela(e1Rel,"char",true,"","1");
+				  insereTabela(e2Rel,"char",true,"","1");
+				  insereTabela(relacao,"bool",true,"","0");
+				  insereTabela(relacaoNeg,"bool",true,"","0");
+				  $$.traducao= $$.traducao+"\t"+cout+"=0;\n\t"+
+				  varChar+"= "+var.nomeVariavel+"["+cout+"];\n\tINICIO_WHILE"+to_string(loops)+":\n"
+				  +"\t"+e1Rel+" = "+varChar+";\n\t"+e2Rel+"= '\\0';\n"+
+				  "\t"+relacao+" = "+e1Rel+"!="+e2Rel+";\n"+
+				  "\t"+relacaoNeg+" = !"+relacao+" ;\n"+
+				  "\tIF("+relacaoNeg+") Goto FIM_WHILE"+to_string(loops)+";\n\t"+
+				  temp+"="+cout+";\n\t"+cout+" = "+temp+"+ 1 ;\n\t"+
+				  varChar+"= "+var.nomeVariavel+"["+cout+"];\n"
+				 +"\tGoto INICIO_WHILE"+to_string(loops)+";\n\tFIM_WHILE"+to_string(loops)+":\n";
+				 alterarTabelaSimb(var.nomeVariavel,var.tipoVariavel,cout);
+				}	
+
 			}
 			|TK_PRINT'('OPERATIONS')'';'{
 				$$.traducao=$3.traducao+"\tcout<<"+$3.label+"<<endl;\n";
@@ -520,10 +541,12 @@ RELACION:
 CALC	:
 			CALC'+'CALC{
 				atributos elemento=verificacaoTipos($1,"+",$3);
+				cout<<$1.label+" "+$3.label+" "+elemento.label<<endl;
 				$$.label=GerarRegistrador();
 				$$.tipo=elemento.tipo;
 				if(($1.tipo=="string"||$1.tipo=="char")&&($3.tipo=="string"||$3.tipo=="char"))
 				{
+					
 					TIPO_SIMBOLO temp1=buscaTemp($1.label);
 					TIPO_SIMBOLO temp2=buscaTemp($3.label);
 					TIPO_SIMBOLO temp3=buscaTemp(elemento.label);
@@ -744,10 +767,10 @@ void insereDeclaracoes(vector<TIPO_SIMBOLO> tabela ){
 		else flag--;
 	}
 }
- atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
+atributos verificacaoTipos(atributos elemen1,string operador ,atributos elemen2){
 	if((operador=="="&&elemen1.tipo==elemen2.tipo&&elemen1.tipo!="var")||
 	(operador=="+"&&elemen1.tipo==elemen2.tipo&&(
-	(elemen1.tipo=="string")||(elemen1.tipo=="int")||(elemen1.tipo=="float"))
+	(elemen1.tipo=="int")||(elemen1.tipo=="float"))
 	)||
 	(((operador!="=")&&(operador!="+")&&(operador!="||")&&(operador!="&&")&&(operador!="!"))
 	&&elemen1.tipo==elemen2.tipo&&(
@@ -777,6 +800,13 @@ void insereDeclaracoes(vector<TIPO_SIMBOLO> tabela ){
 		}
 		insereTabela(elemento.label,elemento.tipo,true,"",labelx);
 		
+		return elemento;
+	}
+	else if((operador=="+"&&elemen1.tipo==elemen2.tipo &&(elemen1.tipo=="string"))){
+		atributos elemento;
+		elemento.tipo=elemen1.tipo;
+		elemento.label=elemen2.label;	
+		elemento.traducao=elemen1.traducao+elemen2.traducao;
 		return elemento;
 	}
 	else if((operador=="!")&&elemen1.tipo==elemen2.tipo&&(elemen1.tipo=="bool"))
