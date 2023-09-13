@@ -41,7 +41,7 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "scanner"   {return TK_SCANNER;}
 "print"     {return TK_PRINT;}
-
+"return"      {return TK_RETURN;}
 [(){}[\];,]	{ return *yytext; }
 (<|>)	{ return *yytext; }
 [+\-*/]		{ return *yytext; }

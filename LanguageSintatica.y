@@ -29,11 +29,25 @@ typedef struct {
 	string tam;
 }TIPO_SIMBOLO;
 typedef struct {
+	string nomeVar;
+	string tipoVar;
+	string nomeOriginal;
+	string valDefault;
+}PARAMETRO;
+typedef struct {
+	string nomeFunc;
+	string tipoFun;
+	string nomeOriginal;
+	vector<PARAMETRO> parametros;
+}FUNCAO;
+
+typedef struct {
 	string nome;
 	string tipo;
 	string tam;
 	bool temp;
 }DECLARACAO;
+vector<FUNCAO> tabelaFuncao;
 vector<DECLARACAO> declaracoes;
 vector<TIPO_SIMBOLO> tabelaSimbolos;
 vector<string> variaveisComAloc;
@@ -63,7 +77,7 @@ void yyerror(string);
 %token TK_OU  TK_E  TK_NEGACAO TK_VAR
 %token TK_IF  TK_ELSE   TK_FOR TK_WHILE TK_DO TK_CONTINUE TK_BREAK
 %token TK_SCANNER TK_PRINT
-%token TK_FIM TK_ERROR TK_IGUAL
+%token TK_FIM TK_ERROR TK_IGUAL TK_RETURN
 
 %start S
 
@@ -93,6 +107,13 @@ CHAVE_ENTRADA	: '{'{
 				//  insereDeclaracoes(tabela);
 				zerarTabela();
 				}
+/* PARENTESE_ENTRADA:'('{
+				
+				inserirPilha(tabelaSimbolos);
+						// vector<TIPO_SIMBOLO>tabela=pilhaTabela.back();
+				//  insereDeclaracoes(tabela);
+				zerarTabela();
+				} */
 CHAVE_SAIDA	: '}'{
 				// vector<TIPO_SIMBOLO>tabela=pilhaTabela.back();
 				//  insereDeclaracoes(tabela);
@@ -152,7 +173,11 @@ BLOCO		:
 				$$.traducao=$1.traducao+ $2.traducao;
 			}
 			;
-
+/* FUNCTIOONCHAMADA:
+			TK_TIPO TK_ID PARENTESE_ENTRADA PARAMETRO')''{'INIT TK_RETURN CHAVE_SAIDA{
+				
+			}
+PARAMETRO: */
 COMANDOS	: 
 			COMANDO COMANDOS{
 				// cout<< "X :"+ pilhaTabela.size()<<endl;
@@ -263,6 +288,19 @@ EXPRESSAO 	:
 				$$.label="";
 				//cout<<"teste"<<endl;
 			}
+			/* |TK_TIPO TK_ID '['TK_NUM']'{
+				verificaExistencia($2.label);
+				string nomeFantasia=$2.label;
+				$2.label=GerarRegistrador();
+				insereTabela($2.label,$1.tipo,false,nomeFantasia,$4.label);
+				// valor.nomeVariavel=$2.label;
+				// valor.tipoVariavel=$1.tipo;
+				// valor.temp=false;
+				// tabelaSimbolos.push_back(valor);
+				$$.traducao="";
+				$$.label="";
+				//cout<<"teste"<<endl;
+			} */
 			|TK_TIPO TK_ID TK_IGUAL ATRIBUICAO{
 				
 				verificaExistencia($2.label);
@@ -673,6 +711,13 @@ ELEMENTS:
 				
 				$$.traducao ="\t"+ $$.label+" = " + $1.label + ";\n";
 			}
+			|'-'TK_REAL{
+				$$.tipo="float";
+				$$.label=GerarRegistrador();
+				insereTabela($$.label,$$.tipo,true,"","0");
+				
+				$$.traducao ="\t"+ $$.label+" = -" + $1.label + ";\n";
+			}
 			|TK_CHARACTER{
 				$$.tipo="char";
 				$$.label=GerarRegistrador();
@@ -1017,17 +1062,17 @@ atributos calcAtribuicao(atributos elemen1,string operador,atributos elemen2){
 		atributos temp;
 		temp.label=GerarRegistrador();
 		temp.tipo=elemen1.tipo;
-		insereTabela(temp.label,temp.tipo,true,"",0);
+		insereTabela(temp.label,temp.tipo,true,"","0");
 		temp.traducao="\t"+ temp.label+" = " +elemen1.label + ";\n";
 		elemen2.tipo="int";
 		elemen2.label=GerarRegistrador();
-		insereTabela(elemen2.label,elemen2.tipo,true,"",0);
+		insereTabela(elemen2.label,elemen2.tipo,true,"","0");
 		elemen2.traducao ="\t"+ elemen2.label+" = 1;\n";
 		atributos soma=verificacaoTipos(temp,operador.substr(0,1),elemen2);
 		atributos tipo2;
 		tipo2.label=GerarRegistrador();
 		tipo2.tipo=soma.tipo;
-		insereTabela(tipo2.label,tipo2.tipo,true,"",0);
+		insereTabela(tipo2.label,tipo2.tipo,true,"","0");
 		if (temp.tipo=="int"&&elemen2.tipo=="float") temp=soma;
 		else if(elemen2.tipo=="int" && temp.tipo=="float") elemen2=soma;
 		tipo2.traducao=soma.traducao+"\t"+tipo2.label+"="+temp.label+operador.substr(0,1)+elemen2.label+";\n";

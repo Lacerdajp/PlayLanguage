@@ -1,7 +1,4 @@
-int main() {
-    string a;
-    string b;
-    scanner(a);
-    b=a+"amor";
+var i;
+i=0;
+i=1.0;
 
- }
